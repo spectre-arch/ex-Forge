@@ -28,6 +28,12 @@ class ExForgeAnalyzer:
         
         diff_context, significant_files = DiffParser.assemble_pr_context(file_diffs)
         
+        # Calculate real additions and deletions if unpopulated from raw stream
+        if (pr_info.additions == 0 and pr_info.deletions == 0) and file_diffs:
+            pr_info.additions = sum(f.additions for f in file_diffs)
+            pr_info.deletions = sum(f.deletions for f in file_diffs)
+            pr_info.changed_files_count = len(file_diffs)
+
         report = self.llm_engine.analyze_pr(pr_info, diff_context)
         
         # Ensure key_files_modified includes the actual significant files if model missed any

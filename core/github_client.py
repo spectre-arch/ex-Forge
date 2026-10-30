@@ -68,14 +68,32 @@ class GitHubClient:
         except Exception:
             pass
 
-        # Fallback if API rate-limited: synthesize minimal metadata from public PR URL
+        # Fallback if API rate-limited: parse .patch header for real title & author
+        real_title = f"{owner}/{repo} Pull Request #{pr_number}"
+        real_author = "contributor"
+        try:
+            patch_resp = requests.get(
+                f"https://github.com/{owner}/{repo}/pull/{pr_number}.patch",
+                headers={"User-Agent": "Mozilla/5.0"},
+                timeout=10
+            )
+            if patch_resp.ok:
+                for line in patch_resp.text.split("\n")[:30]:
+                    if line.startswith("Subject: [PATCH"):
+                        # Extract title after [PATCH ...]
+                        real_title = re.sub(r"^Subject:\s*\[PATCH[^\]]*\]\s*", "", line).strip()
+                    elif line.startswith("From: ") and "<" in line:
+                        real_author = line.replace("From: ", "").split("<")[0].strip()
+        except Exception:
+            pass
+
         return PRInfo(
             owner=owner,
             repo=repo,
             pr_number=pr_number,
-            title=f"{owner}/{repo} Pull Request #{pr_number}",
+            title=real_title,
             body="Public pull request diff imported via unified Git patch.",
-            author="contributor",
+            author=real_author,
             base_branch="main",
             head_branch="patch-branch",
             additions=0,
@@ -133,9 +151,17 @@ class GitHubClient:
                 continue
             first_line = chunk.split("\n")[0]
             filename = first_line.split(" b/")[0].strip()
+            
+            # Count actual additions & deletions from patch lines
+            adds = 0
+            dels = 0
             touched_funcs = []
             for line in chunk.split("\n"):
-                if line.startswith("@@"):
+                if line.startswith("+") and not line.startswith("+++"):
+                    adds += 1
+                elif line.startswith("-") and not line.startswith("---"):
+                    dels += 1
+                elif line.startswith("@@"):
                     parts = line.split("@@")
                     if len(parts) >= 3 and parts[2].strip():
                         sig = parts[2].strip()
@@ -146,6 +172,8 @@ class GitHubClient:
                 FileDiff(
                     filename=filename,
                     status="modified",
+                    additions=adds,
+                    deletions=dels,
                     patch=chunk[:2000],  # cap each patch chunk
                     touched_functions=touched_funcs
                 )
