@@ -6,6 +6,21 @@ import requests
 
 from core.models import PRAnalysisReport, PRInfo, FixRecommendation, FunctionChange
 
+# Auto-load local .env if present
+def _load_env_if_present():
+    env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
+    if os.path.exists(env_path):
+        with open(env_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, v = line.split("=", 1)
+                    k, v = k.strip(), v.strip().strip("'").strip('"')
+                    if k and k not in os.environ:
+                        os.environ[k] = v
+
+_load_env_if_present()
+
 
 SYSTEM_PROMPT = """You are ExForge, an expert Open-Source AI maintainer and code architect.
 Your mission is to examine GitHub Pull Requests, explain the exact architectural changes, identify the modified files and functions, diagnose any edge cases or bugs, and prescribe precise code fixes.
@@ -90,8 +105,9 @@ Please provide:
             "Authorization": f"Bearer {self.groq_api_key}",
             "Content-Type": "application/json"
         }
+        model_to_use = self.model
         payload = {
-            "model": self.model,
+            "model": model_to_use,
             "messages": [
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt}
@@ -102,6 +118,11 @@ Please provide:
         }
 
         resp = requests.post(url, headers=headers, json=payload, timeout=45)
+        if resp.status_code == 400 and "decommissioned" in resp.text:
+            # Fallback to active high-performance open model on Groq
+            payload["model"] = "qwen/qwen3.8-27b"
+            resp = requests.post(url, headers=headers, json=payload, timeout=45)
+
         if not resp.ok:
             raise RuntimeError(f"Groq API Error [{resp.status_code}]: {resp.text}")
 
