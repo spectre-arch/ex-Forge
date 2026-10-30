@@ -114,7 +114,7 @@ Please provide:
             ],
             "response_format": {"type": "json_object"},
             "temperature": 0.2,
-            "max_tokens": 3000
+            "max_tokens": 900
         }
 
         resp = requests.post(url, headers=headers, json=payload, timeout=45)
