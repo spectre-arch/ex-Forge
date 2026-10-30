@@ -105,7 +105,7 @@ Please provide:
             "Authorization": f"Bearer {self.groq_api_key}",
             "Content-Type": "application/json"
         }
-        model_to_use = self.model
+        model_to_use = "openai/gpt-oss-20b" if ("gemma" in self.model or "qwen" in self.model) else self.model
         payload = {
             "model": model_to_use,
             "messages": [
@@ -114,13 +114,14 @@ Please provide:
             ],
             "response_format": {"type": "json_object"},
             "temperature": 0.2,
-            "max_tokens": 900
+            "max_tokens": 1200
         }
 
         resp = requests.post(url, headers=headers, json=payload, timeout=45)
-        if resp.status_code == 400 and "decommissioned" in resp.text:
-            # Fallback to active high-performance open model on Groq
-            payload["model"] = "qwen/qwen3.8-27b"
+        
+        # If rate limited (429) or model deprecated (400), try fallback high-quota model
+        if resp.status_code in (400, 429):
+            payload["model"] = "openai/gpt-oss-120b" if payload["model"] == "openai/gpt-oss-20b" else "openai/gpt-oss-20b"
             resp = requests.post(url, headers=headers, json=payload, timeout=45)
 
         if not resp.ok:
