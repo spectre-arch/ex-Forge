@@ -7,6 +7,8 @@ from core.demo_provider import get_mock_pr_analysis
 from dataclasses import asdict
 
 app = Flask(__name__)
+app.config["TEMPLATES_AUTO_RELOAD"] = True
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
 # Cache for the last analysis to quickly generate patch downloads
 LAST_ANALYSIS = {}
