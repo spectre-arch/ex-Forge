@@ -2,11 +2,11 @@
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>ExForge — Open-Source PR Intelligence & Code Fix Engine</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Pixelify+Sans:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -14,12 +14,13 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'sans-serif'],
+            pixel: ['"Pixelify Sans"', 'sans-serif'],
+            sans: ['"Bricolage Grotesque"', 'system-ui', 'sans-serif'],
             mono: ['"JetBrains Mono"', 'monospace']
           },
           colors: {
             brand: {
-              400: '#34d399',
+              400: '#7FE3C4',
               500: '#10b981',
               600: '#059669'
             }
@@ -29,98 +30,119 @@
     }
   </script>
   <style>
-    /* Custom glow & ambient accents */
-    .bg-grid {
-      background-size: 40px 40px;
-      background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    :root {
+      --bg: #06050D;
+      --ink: #EFEEFF;
+      --muted: #A9A8C9;
     }
-    .glow-emerald {
-      box-shadow: 0 0 35px -5px rgba(16, 185, 129, 0.15);
+    body {
+      background-color: var(--bg);
+      color: var(--ink);
+      font-family: "Bricolage Grotesque", system-ui, -apple-system, sans-serif;
+    }
+    #g {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .scrim {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(ellipse 65% 60% at 50% 40%, rgba(6, 5, 13, 0.72) 20%, rgba(6, 5, 13, 0.92) 85%);
+      z-index: 1;
+    }
+    .pixel-font {
+      font-family: "Pixelify Sans", sans-serif;
+    }
+    .glow-card {
+      transition: all 0.2s ease-in-out;
     }
     .glow-card:hover {
-      box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.12);
-      border-color: rgba(52, 211, 153, 0.3);
+      border-color: rgba(127, 227, 196, 0.4);
+      box-shadow: 0 0 25px -5px rgba(127, 227, 196, 0.15);
     }
   </style>
 </head>
-<body class="bg-[#090D14] text-slate-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-black antialiased relative overflow-x-hidden">
+<body class="min-h-screen flex flex-col antialiased relative selection:bg-[#7FE3C4] selection:text-black">
 
-  <!-- Ambient background glow elements -->
-  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[850px] h-[350px] bg-emerald-500/10 blur-[130px] rounded-full pointer-events-none -z-10"></div>
-  <div class="absolute top-40 right-10 w-[450px] h-[250px] bg-teal-500/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
-  <div class="fixed inset-0 bg-grid pointer-events-none -z-20 opacity-60"></div>
+  <!-- Interactive Pixel Canvas Background -->
+  <canvas id="g" aria-hidden="true"></canvas>
+  <div class="scrim"></div>
 
-  <!-- Top Navigation Header -->
-  <header class="border-b border-slate-800/80 bg-[#090D14]/80 backdrop-blur-xl sticky top-0 z-50 transition">
+  <!-- Header -->
+  <header class="relative z-20 border-b border-slate-800/80 bg-[#06050D]/75 backdrop-blur-md sticky top-0 transition">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
       
-      <!-- Logo & Badges -->
+      <!-- Brand & Tag -->
       <div class="flex items-center space-x-3">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-[1px] shadow-lg shadow-emerald-500/20">
-          <div class="w-full h-full bg-[#0B101B] rounded-[11px] flex items-center justify-center">
-            <span class="text-emerald-400 text-lg font-bold">⚡</span>
-          </div>
+        <div class="w-9 h-9 rounded-lg bg-[#7FE3C4] p-[2px] shadow-lg shadow-[#7FE3C4]/20 flex items-center justify-center">
+          <span class="text-[#06050D] text-xl font-bold pixel-font leading-none">⚡</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="font-bold text-lg tracking-tight text-white">Ex<span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">Forge</span></span>
-          <span class="text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-800/60">
+          <span class="font-bold text-xl tracking-wide pixel-font text-white">Ex<span class="text-[#7FE3C4]">Forge</span></span>
+          <span class="text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded bg-emerald-950/60 text-[#7FE3C4] border border-[#7FE3C4]/30">
             Hacktoberfest '26
           </span>
         </div>
       </div>
 
-      <!-- Live Engine Badges -->
+      <!-- Header Pills -->
       <div class="flex items-center space-x-3 text-xs">
         <div class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-slate-800 text-slate-300 font-mono">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="w-2 h-2 rounded-full bg-[#7FE3C4] animate-pulse"></span>
           <span>Google Gemma 2 / Open-Weight AI</span>
         </div>
 
-        <a href="https://github.com/spectre-arch/ex-Forge" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-slate-300 hover:text-white transition flex items-center gap-1.5 font-medium">
+        <a href="https://github.com/spectre-arch/ex-Forge" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-200 hover:text-white transition flex items-center gap-1.5 font-medium">
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          <span>GitHub</span>
+          <span class="pixel-font text-sm">GitHub</span>
         </a>
       </div>
     </div>
   </header>
 
-  <!-- Hero Banner & Interactive Search -->
-  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full">
+  <!-- Hero & Main Workspace -->
+  <main class="relative z-10 flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full">
     
-    <div class="text-center max-w-3xl mx-auto mb-10 pt-2">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/40 border border-emerald-800/50 text-emerald-400 text-xs font-medium mb-5">
-        <span class="text-xs">✨</span> Autonomous PR Triage & Code Patch Generation
+    <div class="text-center max-w-3xl mx-auto mb-10 pt-4">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#7FE3C4]/10 border border-[#7FE3C4]/30 text-[#7FE3C4] text-xs font-semibold mb-4 tracking-wide pixel-font">
+        👾 Open-Source PR Intelligence &amp; Fix Engine
       </div>
 
-      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-4 leading-tight">
-        Ship open-source PRs <br class="hidden sm:inline"/>
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">with zero friction.</span>
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-4 leading-tight pixel-font">
+        Explain &amp; Forge PRs <br class="hidden sm:inline"/>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#7FE3C4] via-[#8FA6FF] to-[#FF7FA3]">with Open-Weight AI</span>
       </h1>
       
-      <p class="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto mb-8 leading-relaxed">
-        ExForge inspects pull requests, identifies touched functions, catches breaking regressions, and generates ready-to-apply patches for <span class="text-slate-200 font-medium">Contributors</span> and <span class="text-slate-200 font-medium">Maintainers</span>.
+      <p class="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto mb-8 leading-relaxed">
+        Understand pull requests, inspect touched functions, catch breaking regressions, and generate ready-to-apply patches for <span class="text-[#7FE3C4] font-semibold">Contributors</span> and <span class="text-[#8FA6FF] font-semibold">Maintainers</span>.
       </p>
 
       <!-- Search Input Container -->
       <div class="relative max-w-2xl mx-auto">
-        <div class="relative flex flex-col sm:flex-row items-center p-1.5 rounded-2xl bg-[#0E1523]/90 border border-slate-800 focus-within:border-emerald-500/80 focus-within:ring-2 focus-within:ring-emerald-500/20 shadow-2xl transition duration-200">
+        <div class="relative flex flex-col sm:flex-row items-center p-2 rounded-2xl bg-[#090D14]/90 border border-slate-700/80 focus-within:border-[#7FE3C4] focus-within:ring-2 focus-within:ring-[#7FE3C4]/20 shadow-2xl backdrop-blur-xl transition duration-200">
           
-          <div class="flex items-center pl-3.5 w-full">
-            <svg class="w-5 h-5 text-slate-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+          <div class="flex items-center pl-3 w-full">
+            <svg class="w-5 h-5 text-slate-400 mr-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
             <input 
               id="prUrlInput"
               type="text" 
               placeholder="Paste any GitHub PR link (e.g. https://github.com/pallets/flask/pull/6176)" 
-              class="w-full bg-transparent py-2.5 text-sm focus:outline-none text-white placeholder-slate-500 font-mono"
+              class="w-full bg-transparent py-2.5 text-sm focus:outline-none text-white placeholder-slate-400 font-mono"
             />
           </div>
 
           <button 
             id="analyzeBtn"
             onclick="triggerAnalysis()"
-            class="w-full sm:w-auto mt-2 sm:mt-0 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-semibold px-6 py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2 whitespace-nowrap shadow-lg shadow-emerald-500/20 active:scale-95 flex-shrink-0"
+            class="w-full sm:w-auto mt-2 sm:mt-0 bg-[#7FE3C4] hover:bg-[#68d1b1] text-[#06050D] font-bold px-6 py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2 whitespace-nowrap shadow-lg shadow-[#7FE3C4]/20 active:scale-95 flex-shrink-0 pixel-font tracking-wide text-base"
           >
             <span>Analyze PR</span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
@@ -129,14 +151,14 @@
 
         <!-- Quick Launch Presets -->
         <div class="flex flex-wrap items-center justify-center gap-2 mt-4 text-xs text-slate-400">
-          <span class="text-slate-500">Quick Test:</span>
-          <button onclick="setDemo('https://github.com/pallets/flask/pull/6176')" class="px-2.5 py-1 rounded-md bg-slate-900/80 border border-slate-800 hover:border-emerald-500/50 hover:text-emerald-400 transition font-mono">
+          <span class="text-slate-400 pixel-font text-sm">Presets:</span>
+          <button onclick="setDemo('https://github.com/pallets/flask/pull/6176')" class="px-2.5 py-1 rounded-md bg-[#090D14]/90 border border-slate-700/80 hover:border-[#7FE3C4] hover:text-[#7FE3C4] transition font-mono">
             pallets/flask #6176
           </button>
-          <button onclick="setDemo('https://github.com/tiangolo/fastapi/pull/11000')" class="px-2.5 py-1 rounded-md bg-slate-900/80 border border-slate-800 hover:border-emerald-500/50 hover:text-emerald-400 transition font-mono">
+          <button onclick="setDemo('https://github.com/tiangolo/fastapi/pull/11000')" class="px-2.5 py-1 rounded-md bg-[#090D14]/90 border border-slate-700/80 hover:border-[#7FE3C4] hover:text-[#7FE3C4] transition font-mono">
             tiangolo/fastapi #11000
           </button>
-          <button onclick="setDemo('https://github.com/pallets/flask/pull/5500')" class="px-2.5 py-1 rounded-md bg-slate-900/80 border border-slate-800 hover:border-emerald-500/50 hover:text-emerald-400 transition font-mono">
+          <button onclick="setDemo('https://github.com/pallets/flask/pull/5500')" class="px-2.5 py-1 rounded-md bg-[#090D14]/90 border border-slate-700/80 hover:border-[#7FE3C4] hover:text-[#7FE3C4] transition font-mono">
             pallets/flask #5500
           </button>
         </div>
@@ -146,25 +168,25 @@
     <!-- Shimmering Loading State -->
     <div id="loader" class="hidden text-center py-20 max-w-lg mx-auto">
       <div class="relative w-16 h-16 mx-auto mb-6">
-        <div class="absolute inset-0 rounded-full border-2 border-emerald-500/20 animate-ping"></div>
-        <div class="w-16 h-16 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin"></div>
-        <div class="absolute inset-0 flex items-center justify-center text-emerald-400 font-bold text-lg">⚡</div>
+        <div class="absolute inset-0 rounded-full border-2 border-[#7FE3C4]/20 animate-ping"></div>
+        <div class="w-16 h-16 rounded-full border-2 border-[#7FE3C4] border-t-transparent animate-spin"></div>
+        <div class="absolute inset-0 flex items-center justify-center text-[#7FE3C4] font-bold text-xl pixel-font">⚡</div>
       </div>
-      <h3 class="text-lg font-bold text-white mb-1">Auditing Pull Request</h3>
-      <p class="text-slate-400 text-xs">Extracting git diffs, inspecting AST signatures &amp; running Google Gemma 2 triage...</p>
+      <h3 class="text-xl font-bold text-white mb-1 pixel-font">Auditing Pull Request</h3>
+      <p class="text-slate-300 text-xs">Extracting git diffs, inspecting AST signatures &amp; running Google Gemma 2 triage...</p>
     </div>
 
     <!-- Results Container -->
-    <div id="results" class="hidden space-y-6 animate-fade-in">
+    <div id="results" class="hidden space-y-6">
 
       <!-- Top PR Info Banner & Persona Switcher Card -->
-      <div class="bg-[#0E1523]/90 border border-slate-800/90 rounded-2xl p-6 shadow-2xl backdrop-blur-xl">
+      <div class="bg-[#090D14]/90 border border-slate-700/80 rounded-2xl p-6 shadow-2xl backdrop-blur-xl">
         
         <!-- Repo & Title Bar -->
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-800/80">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-800">
           <div class="space-y-1.5">
             <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
-              <span id="repoName" class="px-2.5 py-0.5 rounded-md bg-slate-800/80 text-emerald-400 font-semibold border border-slate-700/60">
+              <span id="repoName" class="px-2.5 py-0.5 rounded-md bg-slate-800 text-[#7FE3C4] font-semibold border border-[#7FE3C4]/30">
                 owner/repo
               </span>
               <span class="text-slate-500">•</span>
@@ -181,7 +203,7 @@
 
           <!-- Quick Changes Stats -->
           <div class="flex items-center gap-2 flex-shrink-0">
-            <span id="changesBadge" class="px-3 py-1.5 rounded-lg bg-slate-900/90 font-mono text-xs font-medium text-slate-300 border border-slate-800">
+            <span id="changesBadge" class="px-3 py-1.5 rounded-lg bg-slate-900 font-mono text-xs font-medium text-slate-300 border border-slate-800">
               +0 / -0
             </span>
           </div>
@@ -190,22 +212,22 @@
         <!-- Segmented Role Switcher -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5">
           <div class="flex items-center gap-2 w-full sm:w-auto">
-            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Perspective:</span>
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider pixel-font text-sm">Mode:</span>
             
             <div class="inline-flex rounded-xl bg-slate-950 p-1 border border-slate-800">
               <button 
                 id="btnRoleContributor" 
                 onclick="switchRole('contributor')" 
-                class="px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/20"
+                class="px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-[#7FE3C4] text-[#06050D] shadow-md pixel-font text-sm font-bold"
               >
                 <span>👨‍💻 Contributor Mode</span>
-                <span class="text-[10px] bg-emerald-950/60 px-1.5 py-0.5 rounded font-mono font-bold text-slate-900">Fix &amp; Ship</span>
+                <span class="text-[10px] bg-emerald-950/40 px-1.5 py-0.5 rounded font-mono font-bold text-[#06050D]">Fix &amp; Ship</span>
               </button>
               
               <button 
                 id="btnRoleMaintainer" 
                 onclick="switchRole('maintainer')" 
-                class="px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-400 hover:text-white"
+                class="px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-400 hover:text-white pixel-font text-sm"
               >
                 <span>🛡️ Maintainer Mode</span>
                 <span class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded font-mono text-slate-300">Triage &amp; Guard</span>
@@ -218,7 +240,7 @@
             <button 
               id="btnContributorAction" 
               onclick="downloadPatch()" 
-              class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-500/20 active:scale-95"
+              class="w-full sm:w-auto bg-[#7FE3C4] hover:bg-[#68d1b1] text-[#06050D] font-bold text-sm px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-[#7FE3C4]/20 active:scale-95 pixel-font"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
               <span>Download .patch for git apply</span>
@@ -227,7 +249,7 @@
             <button 
               id="btnMaintainerAction" 
               onclick="copyReviewComment()" 
-              class="hidden w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-emerald-400 border border-emerald-800/80 text-xs px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition active:scale-95 shadow-md"
+              class="hidden w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-[#7FE3C4] border border-[#7FE3C4]/60 text-sm px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition active:scale-95 shadow-md pixel-font"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
               <span id="copyCommentText">Copy GitHub Review Markdown</span>
@@ -241,17 +263,17 @@
       <div id="viewContributor" class="space-y-6">
         
         <!-- Checklist Banner -->
-        <div class="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-800/40 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+        <div class="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900 border border-[#7FE3C4]/30 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
           <div class="flex items-center gap-3.5">
-            <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-sm">
+            <div class="w-9 h-9 rounded-xl bg-[#7FE3C4]/20 border border-[#7FE3C4]/40 flex items-center justify-center text-[#7FE3C4] font-bold text-sm pixel-font">
               ✓
             </div>
             <div>
-              <div class="text-sm font-semibold text-emerald-300">Contributor Action Plan</div>
-              <div class="text-xs text-slate-400">Review the diagnosed fixes, export your unified patch, and run the 3 terminal commands below to update your branch.</div>
+              <div class="text-sm font-semibold text-[#7FE3C4] pixel-font text-base">Contributor Action Plan</div>
+              <div class="text-xs text-slate-300">Review the diagnosed fixes, export your unified patch, and run the 3 terminal commands below to update your branch.</div>
             </div>
           </div>
-          <div class="text-xs font-mono px-3 py-1.5 rounded-lg bg-slate-950/80 text-emerald-400 border border-slate-800 whitespace-nowrap">
+          <div class="text-xs font-mono px-3 py-1.5 rounded-lg bg-slate-950 text-[#7FE3C4] border border-slate-800 whitespace-nowrap">
             git apply &lt;patch&gt; &amp;&amp; git push
           </div>
         </div>
@@ -260,9 +282,9 @@
           
           <!-- Left: Code Fix Recommendations (7 Cols) -->
           <div class="lg:col-span-7 space-y-4">
-            <div class="bg-[#0E1523]/90 border border-slate-800/80 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-xl">
-              <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800/80">
-                <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+            <div class="bg-[#090D14]/90 border border-slate-700/80 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-xl">
+              <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                <h3 class="text-sm font-bold text-[#7FE3C4] uppercase tracking-wider flex items-center gap-2 pixel-font text-base">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
                   Actionable Code Fixes &amp; Patches
                 </h3>
@@ -275,8 +297,8 @@
           <!-- Right: Missing Tests & Quickstart (5 Cols) -->
           <div class="lg:col-span-5 space-y-6">
             
-            <div class="bg-[#0E1523]/90 border border-slate-800/80 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-xl">
-              <h3 class="text-sm font-bold text-teal-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+            <div class="bg-[#090D14]/90 border border-slate-700/80 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-xl">
+              <h3 class="text-sm font-bold text-[#8FA6FF] uppercase tracking-wider mb-2 flex items-center gap-2 pixel-font text-base">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                 Missing Tests You Should Add
               </h3>
@@ -285,18 +307,18 @@
             </div>
 
             <!-- Terminal Quickstart Card -->
-            <div class="bg-slate-950/90 border border-slate-800/90 rounded-2xl p-5 shadow-xl">
-              <div class="flex items-center gap-2 text-xs font-bold text-slate-200 mb-3">
-                <span class="text-emerald-400">⚡</span> Terminal Quickstart (Apply in 10s):
+            <div class="bg-slate-950/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+              <div class="flex items-center gap-2 text-xs font-bold text-slate-200 mb-3 pixel-font text-sm">
+                <span class="text-[#7FE3C4]">⚡</span> Terminal Quickstart (Apply in 10s):
               </div>
               <div class="space-y-2 text-xs font-mono text-slate-300">
-                <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between">
-                  <span>1. Click <strong class="text-emerald-400">Download .patch</strong> above</span>
+                <div class="p-2.5 rounded-lg bg-[#06050D] border border-slate-800 flex items-center justify-between">
+                  <span>1. Click <strong class="text-[#7FE3C4]">Download .patch</strong> above</span>
                 </div>
-                <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div class="p-2.5 rounded-lg bg-[#06050D] border border-slate-800 flex items-center justify-between">
                   <span class="text-slate-400">$ <span class="text-slate-100">git apply fixes.patch</span></span>
                 </div>
-                <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between">
+                <div class="p-2.5 rounded-lg bg-[#06050D] border border-slate-800 flex items-center justify-between">
                   <span class="text-slate-400">$ <span class="text-slate-100">git commit -am "fix: apply fixes" &amp;&amp; git push</span></span>
                 </div>
               </div>
@@ -311,32 +333,32 @@
       <div id="viewMaintainer" class="hidden space-y-6">
         
         <!-- Maintainer Gatekeeper Banner -->
-        <div class="bg-gradient-to-r from-teal-950/40 via-slate-900 to-slate-900 border border-teal-800/40 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+        <div class="bg-gradient-to-r from-teal-950/40 via-slate-900 to-slate-900 border border-[#8FA6FF]/30 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
           <div class="flex items-center gap-3.5">
-            <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-500/30 flex items-center justify-center text-teal-400 font-bold text-sm">
+            <div class="w-9 h-9 rounded-xl bg-[#8FA6FF]/20 border border-[#8FA6FF]/40 flex items-center justify-center text-[#8FA6FF] font-bold text-sm pixel-font">
               🛡️
             </div>
             <div>
-              <div class="text-sm font-semibold text-teal-300">Maintainer Triage &amp; Risk Gate</div>
-              <div class="text-xs text-slate-400">Review high-level architectural blast radius, breaking changes, and copy ready-to-post feedback.</div>
+              <div class="text-sm font-semibold text-[#8FA6FF] pixel-font text-base">Maintainer Triage &amp; Risk Gate</div>
+              <div class="text-xs text-slate-300">Review high-level architectural blast radius, breaking changes, and copy ready-to-post feedback.</div>
             </div>
           </div>
-          <button onclick="copyReviewComment()" class="text-xs text-teal-400 hover:text-teal-300 underline font-medium whitespace-nowrap">
+          <button onclick="copyReviewComment()" class="text-xs text-[#8FA6FF] hover:underline font-medium whitespace-nowrap pixel-font text-sm">
             Copy Markdown Review ➔
           </button>
         </div>
 
         <!-- High-level Summaries -->
         <div class="grid md:grid-cols-2 gap-5">
-          <div class="bg-[#0E1523]/90 p-5 sm:p-6 rounded-2xl border border-slate-800/80 shadow-xl backdrop-blur-xl">
-            <div class="text-xs uppercase font-bold text-emerald-400 tracking-wider mb-2 flex items-center gap-1.5">
+          <div class="bg-[#090D14]/90 p-5 sm:p-6 rounded-2xl border border-slate-700/80 shadow-xl backdrop-blur-xl">
+            <div class="text-xs uppercase font-bold text-[#7FE3C4] tracking-wider mb-2 flex items-center gap-1.5 pixel-font text-sm">
               <span>📋</span> Executive Summary
             </div>
             <p id="prSummary" class="text-sm text-slate-300 leading-relaxed"></p>
           </div>
 
-          <div class="bg-[#0E1523]/90 p-5 sm:p-6 rounded-2xl border border-slate-800/80 shadow-xl backdrop-blur-xl">
-            <div class="text-xs uppercase font-bold text-teal-400 tracking-wider mb-2 flex items-center gap-1.5">
+          <div class="bg-[#090D14]/90 p-5 sm:p-6 rounded-2xl border border-slate-700/80 shadow-xl backdrop-blur-xl">
+            <div class="text-xs uppercase font-bold text-[#8FA6FF] tracking-wider mb-2 flex items-center gap-1.5 pixel-font text-sm">
               <span>🏛️</span> Architectural Intent &amp; Scope
             </div>
             <p id="prIntent" class="text-sm text-slate-300 leading-relaxed"></p>
@@ -347,9 +369,9 @@
           
           <!-- Left: Blast Radius (6 Cols) -->
           <div class="lg:col-span-6 space-y-4">
-            <div class="bg-[#0E1523]/90 border border-slate-800/80 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-xl">
-              <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider mb-3.5 flex items-center gap-2">
-                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <div class="bg-[#090D14]/90 border border-slate-700/80 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-xl">
+              <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider mb-3.5 flex items-center gap-2 pixel-font text-base">
+                <svg class="w-4 h-4 text-[#7FE3C4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 Blast Radius: Files &amp; Functions Touched
               </h3>
               <div id="maintainerFunctionsList" class="space-y-2.5"></div>
@@ -358,8 +380,8 @@
 
           <!-- Right: Breaking Changes (6 Cols) -->
           <div class="lg:col-span-6 space-y-4">
-            <div class="bg-[#0E1523]/90 border border-slate-800/80 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-xl">
-              <h3 class="text-sm font-bold text-red-400 uppercase tracking-wider mb-3.5 flex items-center gap-2">
+            <div class="bg-[#090D14]/90 border border-slate-700/80 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-xl">
+              <h3 class="text-sm font-bold text-[#FF7FA3] uppercase tracking-wider mb-3.5 flex items-center gap-2 pixel-font text-base">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                 Breaking Changes &amp; Security Risks
               </h3>
@@ -375,15 +397,104 @@
   </main>
 
   <!-- Clean Minimalist Footer -->
-  <footer class="border-t border-slate-800/80 py-8 text-center text-xs text-slate-500 bg-[#090D14]/90">
+  <footer class="relative z-10 border-t border-slate-800/80 py-8 text-center text-xs text-slate-500 bg-[#06050D]/90">
     <div class="flex items-center justify-center gap-2 mb-1">
-      <span class="font-bold text-slate-300">ExForge</span>
+      <span class="font-bold text-slate-300 pixel-font text-sm">ExForge</span>
       <span>•</span>
       <span>Autonomous PR Intelligence Engine</span>
     </div>
     <p>Built for DevForge × Hacktoberfest 2026 Hack Day (Bengaluru Finals) • Powered by Major League Hacking (MLH)</p>
   </footer>
 
+  <!-- Pixel Canvas Git Graph Engine Script -->
+  <script>
+    (function(){
+      var c=document.getElementById('g'),x=c.getContext('2d');
+      var S=2,P=2400,L=9,M=3,seed=7,W=0,H=0,bg='#06050D';
+      function r(){seed=(seed*16807)%2147483647;return seed/2147483647}
+      var br=[],lf=[],cx=30,k=0,i0;
+      for(i0=0;i0<L;i0++)lf.push(0);
+      while(cx<P-420&&k<90){
+        k++;
+        var ps=br.filter(function(q){return q.x0+q.dx+80<cx&&q.x1-cx>240});
+        var par=ps.length&&r()<.5?ps[Math.floor(r()*ps.length)]:null;
+        var a=par?par.b:M;
+        var len=par?Math.min(120+r()*180,par.x1-cx-120):240+r()*420;
+        var x1=Math.min(cx+len,P-270),cand=[],i;
+        for(i=0;i<L;i++)if(i!==M&&i!==a&&lf[i]<=cx&&(!par||Math.abs(i-a)<=2))cand.push(i);
+        if(cand.length&&x1-cx>140){
+          var b=cand[Math.floor(r()*cand.length)],dx=50+25*Math.abs(b-a);
+          br.push({a:a,b:b,x0:cx,x1:x1,dx:dx,col:par?(par.col+1)%4:Math.floor(r()*4)});
+          lf[b]=x1+dx+20;
+        }
+        cx+=60+r()*110;
+      }
+      var dark=matchMedia('(prefers-color-scheme: dark)');
+      var still=matchMedia('(prefers-reduced-motion: reduce)');
+      var stars=[];for(var s=0;s<150;s++)stars.push({u:r(),v:r(),ph:r()*6.28});
+      function pal(){
+        return ['#7FE3C4','#FFB86B','#8FA6FF','#FF7FA3'];
+      }
+      function size(){
+        W=innerWidth;H=innerHeight;
+        c.width=Math.ceil(W/S);c.height=Math.ceil(H/S);
+        x.imageSmoothingEnabled=false;
+        bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||bg;
+      }
+      function y(l){return H*0.12+l*(H*0.76/(L-1))}
+      function fade(Y){return Math.max(0,Math.min(1,Math.min(Y,H-Y)/(H*.2)))}
+      function dot(X,Y,col){x.globalAlpha=.25+.5*fade(Y);x.fillStyle=col;x.fillRect(Math.round(X/S),Math.round(Y/S),1,1)}
+      function hline(X0,X1,Y,col){for(var X=X0;X<=X1;X+=S)dot(X,Y,col)}
+      function bez(a,b,c2,d,col){
+        for(var i=0;i<=360;i++){
+          var t=i/360,u=1-t;
+          dot(u*u*u*a[0]+3*u*u*t*b[0]+3*u*t*t*c2[0]+t*t*t*d[0],
+              u*u*u*a[1]+3*u*u*t*b[1]+3*u*t*t*c2[1]+t*t*t*d[1],col);
+        }
+      }
+      function node(X,Y,col,fill){
+        var px=Math.round(X/S),py=Math.round(Y/S);
+        x.globalAlpha=.4+.6*fade(Y);
+        x.fillStyle=col;x.fillRect(px-2,py-2,5,5);
+        x.fillStyle=fill;x.fillRect(px-1,py-1,3,3);
+      }
+      function draw(t,off,reveal){
+        var C=pal(),blink=Math.floor(t/500)%2===0;
+        x.clearRect(0,0,c.width,c.height);
+        x.fillStyle='#EFEEFF';
+        stars.forEach(function(s){x.globalAlpha=.12+.3*(.5+.5*Math.sin(t/900+s.ph));x.fillRect(Math.floor(s.u*c.width),Math.floor(s.v*c.height),1,1)});
+        x.save();x.beginPath();x.rect(0,0,reveal/S,c.height);x.clip();
+        for(var ox=-(off%P);ox<W;ox+=P){
+          hline(ox,ox+P,y(M),C[0]);
+          for(var m=30;m<P;m+=130)node(ox+m,y(M),C[0],bg);
+          br.forEach(function(b){
+            var col=C[b.col],ya=y(b.a),yb=y(b.b),dx=b.dx;
+            bez([ox+b.x0,ya],[ox+b.x0+dx*.7,ya],[ox+b.x0+dx*.3,yb],[ox+b.x0+dx,yb],col);
+            hline(ox+b.x0+dx,ox+b.x1,yb,col);
+            bez([ox+b.x1,yb],[ox+b.x1+dx*.7,yb],[ox+b.x1+dx*.3,ya],[ox+b.x1+dx,ya],col);
+            for(var n=b.x0+dx+40;n<b.x1-10;n+=110)node(ox+n,yb,col,bg);
+            node(ox+b.x0,ya,col,bg);
+            node(ox+b.x1+dx,ya,blink?col:bg);
+          });
+        }
+        x.restore();
+      }
+      function ease(v){return 1-Math.pow(1-v,3)}
+      var t0=performance.now();
+      function frame(now){
+        var t=now-t0,reveal=(W+100)*ease(Math.min(1,t/2600));
+        draw(t,Math.floor(Math.max(0,t-2600)*0.036/S)*S,reveal);
+        requestAnimationFrame(frame);
+      }
+      function redraw(){size();if(still.matches)draw(0,0,W+100)}
+      size();
+      if(still.matches){draw(0,0,W+100)}else{requestAnimationFrame(frame)}
+      addEventListener('resize',redraw);
+      dark.addEventListener('change',redraw);
+    })();
+  </script>
+
+  <!-- Dashboard Application Logic -->
   <script>
     let currentAnalysis = null;
     let activeRole = 'contributor'; // 'contributor' or 'maintainer'
@@ -398,15 +509,15 @@
       const btnActM = document.getElementById('btnMaintainerAction');
 
       if (role === 'contributor') {
-        btnC.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/20";
-        btnM.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-400 hover:text-white";
+        btnC.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-[#7FE3C4] text-[#06050D] shadow-md pixel-font text-sm font-bold";
+        btnM.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-400 hover:text-white pixel-font text-sm";
         viewC.classList.remove('hidden');
         viewM.classList.add('hidden');
         btnActC.classList.remove('hidden');
         btnActM.classList.add('hidden');
       } else {
-        btnM.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-950 shadow-md shadow-teal-500/20";
-        btnC.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-400 hover:text-white";
+        btnM.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-[#8FA6FF] text-[#06050D] shadow-md pixel-font text-sm font-bold";
+        btnC.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-400 hover:text-white pixel-font text-sm";
         viewM.classList.remove('hidden');
         viewC.classList.add('hidden');
         btnActM.classList.remove('hidden');
@@ -462,27 +573,27 @@
       cFixes.innerHTML = '';
       if (!report.fix_recommendations || report.fix_recommendations.length === 0) {
         cFixes.innerHTML = `
-          <div class="p-6 rounded-xl bg-emerald-950/20 border border-emerald-800/40 text-center space-y-2">
+          <div class="p-6 rounded-xl bg-emerald-950/20 border border-[#7FE3C4]/30 text-center space-y-2">
             <div class="text-2xl">🎉</div>
-            <div class="text-sm font-semibold text-emerald-300">Clean Implementation — Merge Ready!</div>
-            <p class="text-xs text-slate-400">No bugs or syntax errors detected in this pull request. The code adheres to clean architectural patterns.</p>
+            <div class="text-base font-semibold text-[#7FE3C4] pixel-font">Clean Implementation — Merge Ready!</div>
+            <p class="text-xs text-slate-300">No bugs or syntax errors detected in this pull request. The code adheres to clean architectural patterns.</p>
           </div>
         `;
       } else {
         report.fix_recommendations.forEach((fix, i) => {
           const box = document.createElement('div');
-          box.className = "p-4 sm:p-5 bg-slate-950/80 border border-slate-800/90 rounded-xl space-y-2.5 glow-card transition duration-200";
+          box.className = "p-4 sm:p-5 bg-slate-950/80 border border-slate-700/80 rounded-xl space-y-2.5 glow-card";
           box.innerHTML = `
             <div class="flex items-center justify-between text-xs">
-              <span class="font-mono text-emerald-400 font-bold">${fix.function_or_scope}</span>
+              <span class="font-mono text-[#7FE3C4] font-bold">${fix.function_or_scope}</span>
               <span class="px-2 py-0.5 rounded bg-amber-950/60 text-amber-300 border border-amber-800 text-[10px] uppercase font-bold tracking-wider">${fix.issue_type}</span>
             </div>
             <div class="text-xs text-slate-300 leading-relaxed">${fix.description}</div>
-            <div class="text-[11px] text-slate-500 font-mono flex items-center gap-1">
-              <span>📄 Target:</span> <span class="text-slate-400">${fix.file_path}</span>
+            <div class="text-[11px] text-slate-400 font-mono flex items-center gap-1">
+              <span>📄 Target:</span> <span class="text-slate-300">${fix.file_path}</span>
             </div>
             ${fix.suggested_code_diff ? `
-              <pre class="bg-[#0B101B] p-3.5 rounded-lg text-xs font-mono text-emerald-300 overflow-x-auto border border-slate-800/90 leading-relaxed"><code>${escapeHtml(fix.suggested_code_diff)}</code></pre>
+              <pre class="bg-[#06050D] p-3.5 rounded-lg text-xs font-mono text-[#7FE3C4] overflow-x-auto border border-slate-800 leading-relaxed"><code>${escapeHtml(fix.suggested_code_diff)}</code></pre>
             ` : ''}
           `;
           cFixes.appendChild(box);
@@ -497,8 +608,8 @@
       } else {
         report.missing_tests.forEach(t => {
           const p = document.createElement('div');
-          p.className = "p-3 bg-teal-950/20 border border-teal-900/40 rounded-xl text-teal-300 flex items-start gap-2.5";
-          p.innerHTML = `<span class="text-teal-400 font-bold mt-0.5">🧪</span> <span>${t}</span>`;
+          p.className = "p-3 bg-[#8FA6FF]/10 border border-[#8FA6FF]/30 rounded-xl text-slate-200 flex items-start gap-2.5";
+          p.innerHTML = `<span class="text-[#8FA6FF] font-bold mt-0.5">🧪</span> <span>${t}</span>`;
           cTests.appendChild(p);
         });
       }
@@ -508,11 +619,11 @@
       mFuncs.innerHTML = '';
       (report.touched_functions || []).forEach(fn => {
         const div = document.createElement('div');
-        div.className = "p-3.5 bg-slate-950/70 border border-slate-800/80 rounded-xl glow-card transition duration-200";
+        div.className = "p-3.5 bg-slate-950/70 border border-slate-700/80 rounded-xl glow-card";
         div.innerHTML = `
-          <div class="text-xs font-mono text-emerald-400 font-semibold truncate">${fn.function_name}</div>
-          <div class="text-[11px] text-slate-500 font-mono mt-0.5">${fn.file_path}</div>
-          <div class="text-xs text-slate-400 mt-1.5">${fn.summary_of_change}</div>
+          <div class="text-xs font-mono text-[#7FE3C4] font-semibold truncate">${fn.function_name}</div>
+          <div class="text-[11px] text-slate-400 font-mono mt-0.5">${fn.file_path}</div>
+          <div class="text-xs text-slate-300 mt-1.5">${fn.summary_of_change}</div>
         `;
         mFuncs.appendChild(div);
       });
@@ -521,7 +632,7 @@
       const mRisks = document.getElementById('maintainerRisksList');
       mRisks.innerHTML = '';
       if (!report.breaking_changes_or_risks || report.breaking_changes_or_risks.length === 0) {
-        mRisks.innerHTML = `<div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl text-emerald-400 flex items-center gap-2 text-xs"><span>✓</span> Zero critical breaking changes detected.</div>`;
+        mRisks.innerHTML = `<div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl text-[#7FE3C4] flex items-center gap-2 text-xs"><span>✓</span> Zero critical breaking changes detected.</div>`;
       } else {
         report.breaking_changes_or_risks.forEach(r => {
           const p = document.createElement('div');
