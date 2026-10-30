@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Pixelify+Sans:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -68,6 +69,23 @@
       border-color: rgba(127, 227, 196, 0.4);
       box-shadow: 0 0 25px -5px rgba(127, 227, 196, 0.15);
     }
+    /* Ghost Avatar Styling */
+    .ghost-avatar {
+      touch-action: none;
+      cursor: grab;
+      background: radial-gradient(circle at 35% 30%, #2B2560, #1A1738 70%);
+      box-shadow: 0 0 0 2px #7FE3C4, 0 0 0 5px #06050D, 0 0 0 7px #8FA6FF, 0 10px 25px rgba(0,0,0,0.6);
+    }
+    .ghost-avatar:active {
+      cursor: grabbing;
+    }
+    #ghost-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased relative selection:bg-[#7FE3C4] selection:text-black">
@@ -75,6 +93,16 @@
   <!-- Interactive Pixel Canvas Background -->
   <canvas id="g" aria-hidden="true"></canvas>
   <div class="scrim"></div>
+
+  <!-- Miniature 3D Pixel Ghost in Corner -->
+  <div class="fixed bottom-5 right-5 z-40 flex items-center gap-3 group">
+    <div class="hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-[#090D14]/90 border border-slate-700/80 px-2.5 py-1.5 rounded-lg text-xs font-mono text-[#7FE3C4] shadow-xl backdrop-blur-md">
+      <span>👻 Drag to spin me!</span>
+    </div>
+    <div class="ghost-avatar w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden select-none" id="av" title="DevForge Ghost • Drag to spin!">
+      <canvas id="ghost-canvas" role="img" aria-label="Animated 3D pixel ghost. Drag to spin it."></canvas>
+    </div>
+  </div>
 
   <!-- Header -->
   <header class="relative z-20 border-b border-slate-800/80 bg-[#06050D]/75 backdrop-blur-md sticky top-0 transition">
@@ -491,6 +519,179 @@
       if(still.matches){draw(0,0,W+100)}else{requestAnimationFrame(frame)}
       addEventListener('resize',redraw);
       dark.addEventListener('change',redraw);
+    })();
+  </script>
+
+  <!-- Miniature 3D Pixel Ghost Three.js Engine Script -->
+  <script>
+    (function(){
+      var RES = 128;
+      var cv = document.getElementById('ghost-canvas');
+      var renderer = new THREE.WebGLRenderer({canvas: cv, antialias: false, alpha: true});
+      renderer.setPixelRatio(1);
+      renderer.setSize(RES, RES, false);
+      var scene = new THREE.Scene();
+      var cam = new THREE.PerspectiveCamera(36, 1, 0.1, 50);
+      cam.position.set(0, 0.3, 6);
+      cam.lookAt(0, -0.05, 0);
+
+      // Lighting
+      scene.add(new THREE.AmbientLight(0xC9C7FF, 0.65));
+      var keyLight = new THREE.DirectionalLight(0xffffff, 0.9);
+      keyLight.position.set(2.5, 3, 4);
+      scene.add(keyLight);
+      var rimLight = new THREE.DirectionalLight(0x7FE3C4, 0.7);
+      rimLight.position.set(-3, 1, -2);
+      scene.add(rimLight);
+
+      // Toon shading ramp
+      var ramp = new THREE.DataTexture(new Uint8Array([120, 190, 255]), 3, 1, THREE.LuminanceFormat);
+      ramp.minFilter = ramp.magFilter = THREE.NearestFilter;
+      ramp.needsUpdate = true;
+      var whiteMat = new THREE.MeshToonMaterial({color: 0xEFEEFF, gradientMap: ramp, side: THREE.DoubleSide});
+
+      // Ghost body
+      var prof = [];
+      for (var i = 0; i <= 16; i++) {
+        var a = i / 16 * Math.PI / 2;
+        prof.push(new THREE.Vector2(Math.sin(a), 0.2 + Math.cos(a)));
+      }
+      for (var i = 1; i <= 16; i++) {
+        prof.push(new THREE.Vector2(1, 0.2 - i * (1.2 / 16)));
+      }
+      var geo = new THREE.LatheGeometry(prof, 40);
+      var pos = geo.attributes.position, base = pos.array.slice();
+      var body = new THREE.Mesh(geo, whiteMat);
+
+      function hem(t) {
+        var p = pos.array;
+        for (var n = 0; n < p.length; n += 3) {
+          var x = base[n], y = base[n + 1], z = base[n + 2];
+          if (y < -0.3) {
+            var k = (-0.3 - y) / 0.7, th = Math.atan2(z, x);
+            y += 0.22 * k * Math.sin(th * 5 + t * 3);
+          }
+          p[n + 1] = y;
+        }
+        pos.needsUpdate = true;
+        geo.computeVertexNormals();
+      }
+
+      var ghost = new THREE.Group();
+      ghost.add(body);
+      scene.add(ghost);
+
+      // Face
+      var blackMat = new THREE.MeshBasicMaterial({color: 0x06050D});
+      var pinkMat = new THREE.MeshBasicMaterial({color: 0xFF7FA3});
+      function makeEye(sx) {
+        var e = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 10), blackMat);
+        e.scale.set(0.12, 0.22, 0.08);
+        e.position.set(sx * 0.36, 0.5, 0.9);
+        return e;
+      }
+      var eyeL = makeEye(-1), eyeR = makeEye(1);
+      ghost.add(eyeL, eyeR);
+
+      var mouth = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 10), blackMat);
+      mouth.scale.set(0.09, 0.07, 0.04);
+      mouth.position.set(0, 0.2, 0.99);
+      ghost.add(mouth);
+
+      [-1, 1].forEach(function(s) {
+        var ch = new THREE.Mesh(new THREE.CircleGeometry(0.13, 8), pinkMat);
+        ch.position.set(s * 0.62, 0.22, 0.78);
+        ch.rotation.y = s * 0.66;
+        ghost.add(ch);
+      });
+
+      // Arms
+      function makeArm(s) {
+        var g = new THREE.Group();
+        g.position.set(s * 0.98, 0, 0.05);
+        var m = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), whiteMat);
+        m.scale.set(0.2, 0.36, 0.2);
+        m.position.y = -0.3;
+        g.add(m);
+        ghost.add(g);
+        return g;
+      }
+      var armL = makeArm(-1), armR = makeArm(1);
+
+      // Ground shadow
+      var shadow = new THREE.Mesh(
+        new THREE.CircleGeometry(0.9, 16),
+        new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.4})
+      );
+      shadow.rotation.x = -Math.PI / 2;
+      shadow.position.y = -1.75;
+      scene.add(shadow);
+
+      // Sparkles
+      var sparkles = [], sm = new THREE.MeshBasicMaterial({color: 0x8FA6FF});
+      for (var i = 0; i < 7; i++) {
+        var s = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.09, 0.09), sm);
+        sparkles.push({m: s, a: i * 0.9, r: 1.5 + (i % 3) * 0.2, h: -1 + i * 0.35});
+        scene.add(s);
+      }
+
+      // Drag to spin interactivity
+      var isDragging = false, lastX = 0, spin = 0, vel = 0;
+      var el = document.getElementById('av');
+      el.addEventListener('pointerdown', function(e) {
+        isDragging = true;
+        lastX = e.clientX;
+        el.setPointerCapture(e.pointerId);
+      });
+      el.addEventListener('pointermove', function(e) {
+        if (!isDragging) return;
+        vel = (e.clientX - lastX) * 0.012;
+        spin += vel;
+        lastX = e.clientX;
+      });
+      function endDrag() { isDragging = false; }
+      el.addEventListener('pointerup', endDrag);
+      el.addEventListener('pointercancel', endDrag);
+
+      var blinkAt = 2.5, t0 = performance.now();
+      function animateGhost(t) {
+        var bob = Math.sin(t * 2) * 0.12;
+        if (!isDragging) {
+          spin += vel;
+          vel *= 0.94;
+          spin *= 0.985;
+        }
+        ghost.position.y = bob;
+        ghost.rotation.y = Math.sin(t * 0.8) * 0.45 + spin;
+        ghost.rotation.z = Math.sin(t * 1.3) * 0.05;
+        hem(t);
+
+        armL.rotation.z = -0.25 - 0.45 * Math.sin(t * 4);
+        armR.rotation.z = 0.25 + 0.45 * Math.sin(t * 4 + 1.2);
+
+        var bl = t - blinkAt, ey = 1;
+        if (bl > 0 && bl < 0.16) ey = 0.12;
+        if (bl >= 0.16) blinkAt = t + 2 + Math.abs(Math.sin(t * 7)) * 3;
+        eyeL.scale.y = eyeR.scale.y = 0.22 * ey;
+        mouth.scale.y = 0.07 + 0.03 * Math.sin(t * 2);
+
+        var sScale = 1 - bob * 0.5;
+        shadow.scale.set(sScale, sScale, sScale);
+
+        sparkles.forEach(function(p) {
+          var an = p.a + t * 0.6;
+          p.m.position.set(Math.cos(an) * p.r, p.h + Math.sin(t * 1.5 + p.a) * 0.12, Math.sin(an) * p.r);
+          p.m.rotation.set(t, t * 0.7, 0);
+        });
+
+        renderer.render(scene, cam);
+      }
+
+      function ghostLoop(now) {
+        animateGhost((now - t0) / 1000);
+        requestAnimationFrame(ghostLoop);
+      }
+      requestAnimationFrame(ghostLoop);
     })();
   </script>
 
