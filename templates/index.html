@@ -12,7 +12,6 @@
         extend: {
           colors: {
             brand: {
-              50: '#f0fdf4',
               500: '#22c55e',
               600: '#16a34a',
               700: '#15803d'
@@ -58,7 +57,7 @@
         Deep PR Triage & Code Fixes with <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">Open-Weight AI</span>
       </h1>
       <p class="text-gray-400 text-base sm:text-lg">
-        Explain architectural changes, inspect touched functions, and prescribe instant, merge-ready patches for any open-source pull request.
+        Tailored perspectives for both <span class="text-emerald-400 font-semibold">Contributors</span> getting code merged and <span class="text-teal-400 font-semibold">Maintainers</span> protecting codebases.
       </p>
 
       <!-- Input Box -->
@@ -100,7 +99,7 @@
     <!-- Results Area -->
     <div id="results" class="hidden space-y-6">
 
-      <!-- Header Card -->
+      <!-- Header Card with Persona Toggle -->
       <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-xl">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-800 pb-4 mb-4">
           <div>
@@ -117,61 +116,169 @@
             <span id="changesBadge" class="px-3 py-1 bg-gray-800 rounded-lg text-xs font-mono text-gray-300 border border-gray-700">
               +0 / -0
             </span>
-            <button onclick="downloadPatch()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-700 text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
-              <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-              Export .patch
+          </div>
+        </div>
+
+        <!-- Role Category Selector (Contributor vs Maintainer) -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gray-950/80 p-3 rounded-xl border border-gray-800">
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <span class="text-xs text-gray-400 font-medium uppercase tracking-wider mr-2">Perspective:</span>
+            <div class="inline-flex rounded-lg bg-gray-900 p-1 border border-gray-800">
+              <button 
+                id="btnRoleContributor" 
+                onclick="switchRole('contributor')" 
+                class="px-4 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-2 bg-emerald-500 text-gray-950 shadow-md"
+              >
+                <span>👨‍💻 Contributor Mode</span>
+                <span class="text-[10px] bg-emerald-950/40 px-1.5 py-0.2 rounded text-gray-900 font-mono">Fix & Ship</span>
+              </button>
+              <button 
+                id="btnRoleMaintainer" 
+                onclick="switchRole('maintainer')" 
+                class="px-4 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-2 text-gray-400 hover:text-white"
+              >
+                <span>🛡️ Maintainer Mode</span>
+                <span class="text-[10px] bg-gray-800 px-1.5 py-0.2 rounded text-gray-300 font-mono">Review & Guard</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Action Button based on Role -->
+          <div id="roleActionArea">
+            <button 
+              id="btnContributorAction" 
+              onclick="downloadPatch()" 
+              class="bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-bold text-xs px-4 py-2 rounded-lg flex items-center gap-2 transition shadow-md shadow-emerald-500/20"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>Download .patch for git apply</span>
+            </button>
+
+            <button 
+              id="btnMaintainerAction" 
+              onclick="copyReviewComment()" 
+              class="hidden bg-gray-800 hover:bg-gray-700 text-emerald-400 border border-emerald-800 text-xs px-4 py-2 rounded-lg flex items-center gap-2 transition"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+              <span id="copyCommentText">Copy GitHub Review Comment</span>
             </button>
           </div>
         </div>
 
-        <!-- High-level Summaries -->
-        <div class="grid md:grid-cols-2 gap-4">
-          <div class="bg-gray-950/60 p-4 rounded-lg border border-gray-800/80">
-            <div class="text-xs uppercase font-bold text-emerald-400 tracking-wider mb-1">Executive Summary</div>
-            <p id="prSummary" class="text-sm text-gray-300 leading-relaxed"></p>
+      </div>
+
+      <!-- ==================== VIEW 1: CONTRIBUTOR MODE ==================== -->
+      <div id="viewContributor" class="space-y-6">
+        
+        <!-- Contributor Quick Guide Banner -->
+        <div class="bg-gradient-to-r from-emerald-950/40 via-gray-900 to-gray-900 border border-emerald-800/40 rounded-xl p-4 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">✓</div>
+            <div>
+              <div class="text-sm font-semibold text-emerald-300">Contributor Action Checklist</div>
+              <div class="text-xs text-gray-400">Review the diagnosed fixes below, download the patch, apply locally, and update your PR branch.</div>
+            </div>
           </div>
-          <div class="bg-gray-950/60 p-4 rounded-lg border border-gray-800/80">
-            <div class="text-xs uppercase font-bold text-teal-400 tracking-wider mb-1">Architectural Intent</div>
-            <p id="prIntent" class="text-sm text-gray-300 leading-relaxed"></p>
+          <div class="text-xs text-gray-400 font-mono hidden md:block">
+            git apply &lt;patch&gt; &amp;&amp; git push
           </div>
+        </div>
+
+        <div class="grid lg:grid-cols-12 gap-6">
+          
+          <!-- Left: Fix Guidance (7 Cols) -->
+          <div class="lg:col-span-7 space-y-4">
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-xl">
+              <div class="flex items-center justify-between mb-3 border-b border-gray-800 pb-3">
+                <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                  Step-by-Step Code Fixes
+                </h3>
+                <span class="text-[11px] text-gray-400 font-mono">Prescribed by Gemma 2</span>
+              </div>
+              <div id="contributorFixesList" class="space-y-4"></div>
+            </div>
+          </div>
+
+          <!-- Right: Missing Tests & Pre-flight (5 Cols) -->
+          <div class="lg:col-span-5 space-y-6">
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-xl">
+              <h3 class="text-sm font-bold text-teal-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                Missing Tests You Should Add
+              </h3>
+              <p class="text-xs text-gray-400 mb-3">Adding these tests will satisfy maintainer standards and prevent CI rejections:</p>
+              <div id="contributorTestsList" class="space-y-2 text-xs"></div>
+            </div>
+
+            <!-- How to apply instructions card -->
+            <div class="bg-gray-950/80 border border-gray-800 rounded-xl p-4 text-xs space-y-2">
+              <div class="font-bold text-gray-300">Terminal Quickstart:</div>
+              <ol class="list-decimal list-inside text-gray-400 space-y-1 font-mono text-[11px]">
+                <li>Click <span class="text-emerald-400">"Download .patch"</span> above</li>
+                <li>Run: <span class="text-white">git apply path/to/fixes.patch</span></li>
+                <li>Verify: <span class="text-white">git diff</span></li>
+                <li>Push: <span class="text-white">git commit -am "fix: apply fixes" &amp;&amp; git push</span></li>
+              </ol>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <!-- Main Columns: Touched Functions & Actionable Fixes -->
-      <div class="grid lg:grid-cols-12 gap-6">
-
-        <!-- Left: Modified Files & Functions (5 Cols) -->
-        <div class="lg:col-span-5 space-y-6">
-          <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-xl">
-            <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-              Files & Functions Touched
-            </h3>
-            <div id="functionsList" class="space-y-2.5"></div>
+      <!-- ==================== VIEW 2: MAINTAINER MODE ==================== -->
+      <div id="viewMaintainer" class="hidden space-y-6">
+        
+        <!-- Maintainer Gatekeeper Banner -->
+        <div class="bg-gradient-to-r from-teal-950/40 via-gray-900 to-gray-900 border border-teal-800/40 rounded-xl p-4 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-teal-500/20 flex items-center justify-center text-teal-400 font-bold">🛡️</div>
+            <div>
+              <div class="text-sm font-semibold text-teal-300">Maintainer Triage &amp; Risk Gate</div>
+              <div class="text-xs text-gray-400">Review high-level architectural blast radius, breaking changes, and copy ready-to-post review feedback.</div>
+            </div>
           </div>
+          <button onclick="copyReviewComment()" class="text-xs text-teal-400 hover:underline font-medium hidden md:block">
+            Copy Markdown Review Comment ➔
+          </button>
+        </div>
 
-          <!-- Risks & Gaps -->
-          <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-xl">
-            <h3 class="text-sm font-bold text-red-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-              Risks & Missing Tests
-            </h3>
-            <div id="risksList" class="space-y-2 text-xs"></div>
+        <!-- High-level Summaries -->
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="bg-gray-900 p-5 rounded-xl border border-gray-800 shadow-xl">
+            <div class="text-xs uppercase font-bold text-emerald-400 tracking-wider mb-2">Executive Summary</div>
+            <p id="prSummary" class="text-sm text-gray-300 leading-relaxed"></p>
+          </div>
+          <div class="bg-gray-900 p-5 rounded-xl border border-gray-800 shadow-xl">
+            <div class="text-xs uppercase font-bold text-teal-400 tracking-wider mb-2">Architectural Intent &amp; Scope</div>
+            <p id="prIntent" class="text-sm text-gray-300 leading-relaxed"></p>
           </div>
         </div>
 
-        <!-- Right: Actionable Fix Recommendations & Diffs (7 Cols) -->
-        <div class="lg:col-span-7">
-          <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-xl">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                Actionable Fix & Patch Guide
+        <div class="grid lg:grid-cols-12 gap-6">
+          
+          <!-- Left: Files & Functions Blast Radius (6 Cols) -->
+          <div class="lg:col-span-6 space-y-4">
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-xl">
+              <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Blast Radius: Files &amp; Functions Touched
               </h3>
-              <span class="text-xs text-gray-500">Ready to commit</span>
+              <div id="maintainerFunctionsList" class="space-y-2.5"></div>
             </div>
-            <div id="fixesList" class="space-y-4"></div>
           </div>
+
+          <!-- Right: Breaking Changes & Risks (6 Cols) -->
+          <div class="lg:col-span-6 space-y-4">
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-xl">
+              <h3 class="text-sm font-bold text-red-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                Breaking Change &amp; Security Risks
+              </h3>
+              <div id="maintainerRisksList" class="space-y-2 text-xs"></div>
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -185,6 +292,33 @@
 
   <script>
     let currentAnalysis = null;
+    let activeRole = 'contributor'; // 'contributor' or 'maintainer'
+
+    function switchRole(role) {
+      activeRole = role;
+      const btnC = document.getElementById('btnRoleContributor');
+      const btnM = document.getElementById('btnRoleMaintainer');
+      const viewC = document.getElementById('viewContributor');
+      const viewM = document.getElementById('viewMaintainer');
+      const btnActC = document.getElementById('btnContributorAction');
+      const btnActM = document.getElementById('btnMaintainerAction');
+
+      if (role === 'contributor') {
+        btnC.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-2 bg-emerald-500 text-gray-950 shadow-md";
+        btnM.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-2 text-gray-400 hover:text-white";
+        viewC.classList.remove('hidden');
+        viewM.classList.add('hidden');
+        btnActC.classList.remove('hidden');
+        btnActM.classList.add('hidden');
+      } else {
+        btnM.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-2 bg-teal-400 text-gray-950 shadow-md";
+        btnC.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-2 text-gray-400 hover:text-white";
+        viewM.classList.remove('hidden');
+        viewC.classList.add('hidden');
+        btnActM.classList.remove('hidden');
+        btnActC.classList.add('hidden');
+      }
+    }
 
     function setDemo(url) {
       document.getElementById('prUrlInput').value = url;
@@ -225,12 +359,43 @@
       document.getElementById('prTitle').innerText = `#${pr_info.pr_number}: ${pr_info.title}`;
       document.getElementById('changesBadge').innerText = `+${pr_info.additions} / -${pr_info.deletions} (${pr_info.changed_files_count} files)`;
 
+      // Summaries for maintainer view
       document.getElementById('prSummary').innerText = report.executive_summary;
       document.getElementById('prIntent').innerText = report.architectural_intent;
 
-      // Render Functions
-      const fnList = document.getElementById('functionsList');
-      fnList.innerHTML = '';
+      // Render Contributor Fixes
+      const cFixes = document.getElementById('contributorFixesList');
+      cFixes.innerHTML = '';
+      (report.fix_recommendations || []).forEach((fix, i) => {
+        const box = document.createElement('div');
+        box.className = "p-4 bg-gray-950/80 border border-gray-800 rounded-lg space-y-2";
+        box.innerHTML = `
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-mono text-emerald-400 font-bold">${fix.function_or_scope}</span>
+            <span class="px-2 py-0.5 rounded bg-amber-950/50 text-amber-300 border border-amber-800 text-[10px] uppercase font-semibold">${fix.issue_type}</span>
+          </div>
+          <div class="text-xs text-gray-300">${fix.description}</div>
+          <div class="text-[11px] text-gray-500 font-mono">File: ${fix.file_path}</div>
+          ${fix.suggested_code_diff ? `
+            <pre class="bg-gray-900 p-3 rounded-md text-xs font-mono text-emerald-300 overflow-x-auto border border-gray-800"><code>${escapeHtml(fix.suggested_code_diff)}</code></pre>
+          ` : ''}
+        `;
+        cFixes.appendChild(box);
+      });
+
+      // Render Contributor Tests
+      const cTests = document.getElementById('contributorTestsList');
+      cTests.innerHTML = '';
+      (report.missing_tests || []).forEach(t => {
+        const p = document.createElement('div');
+        p.className = "p-2.5 bg-teal-950/20 border border-teal-900/40 rounded text-teal-300";
+        p.innerText = `🧪 ${t}`;
+        cTests.appendChild(p);
+      });
+
+      // Render Maintainer Functions Blast Radius
+      const mFuncs = document.getElementById('maintainerFunctionsList');
+      mFuncs.innerHTML = '';
       (report.touched_functions || []).forEach(fn => {
         const div = document.createElement('div');
         div.className = "p-3 bg-gray-950/70 border border-gray-800 rounded-lg";
@@ -239,43 +404,17 @@
           <div class="text-[11px] text-gray-500 font-mono">${fn.file_path}</div>
           <div class="text-xs text-gray-400 mt-1">${fn.summary_of_change}</div>
         `;
-        fnList.appendChild(div);
+        mFuncs.appendChild(div);
       });
 
-      // Render Risks
-      const riskList = document.getElementById('risksList');
-      riskList.innerHTML = '';
+      // Render Maintainer Risks
+      const mRisks = document.getElementById('maintainerRisksList');
+      mRisks.innerHTML = '';
       (report.breaking_changes_or_risks || []).forEach(r => {
         const p = document.createElement('div');
-        p.className = "p-2 bg-red-950/20 border border-red-900/40 rounded text-red-300";
+        p.className = "p-2.5 bg-red-950/20 border border-red-900/40 rounded text-red-300";
         p.innerText = `⚠️ ${r}`;
-        riskList.appendChild(p);
-      });
-      (report.missing_tests || []).forEach(t => {
-        const p = document.createElement('div');
-        p.className = "p-2 bg-blue-950/20 border border-blue-900/40 rounded text-blue-300";
-        p.innerText = `🧪 ${t}`;
-        riskList.appendChild(p);
-      });
-
-      // Render Fixes
-      const fixesContainer = document.getElementById('fixesList');
-      fixesContainer.innerHTML = '';
-      (report.fix_recommendations || []).forEach((fix, i) => {
-        const box = document.createElement('div');
-        box.className = "p-4 bg-gray-950/80 border border-gray-800 rounded-lg space-y-2";
-        box.innerHTML = `
-          <div class="flex items-center justify-between text-xs">
-            <span class="font-mono text-teal-400 font-bold">${fix.function_or_scope}</span>
-            <span class="px-2 py-0.5 rounded bg-amber-950/50 text-amber-300 border border-amber-800 text-[10px] uppercase font-semibold">${fix.issue_type}</span>
-          </div>
-          <div class="text-xs text-gray-400">${fix.description}</div>
-          <div class="text-[11px] text-gray-500 font-mono">Target: ${fix.file_path}</div>
-          ${fix.suggested_code_diff ? `
-            <pre class="bg-gray-900 p-3 rounded-md text-xs font-mono text-emerald-300 overflow-x-auto border border-gray-800"><code>${escapeHtml(fix.suggested_code_diff)}</code></pre>
-          ` : ''}
-        `;
-        fixesContainer.appendChild(box);
+        mRisks.appendChild(p);
       });
 
       document.getElementById('results').classList.remove('hidden');
@@ -288,6 +427,39 @@
     function downloadPatch() {
       if (!currentAnalysis) return;
       window.location.href = `/api/patch?url=${encodeURIComponent(document.getElementById('prUrlInput').value)}`;
+    }
+
+    function copyReviewComment() {
+      if (!currentAnalysis) return;
+      const { pr_info, report } = currentAnalysis;
+
+      let comment = `## ⚡ ExForge Automated PR Review\n\n`;
+      comment += `### 📋 Summary\n${report.executive_summary}\n\n`;
+      comment += `### ⚠️ Risks & Considerations\n`;
+      (report.breaking_changes_or_risks || []).forEach(r => {
+        comment += `- ⚠️ ${r}\n`;
+      });
+      comment += `\n### 🧪 Recommended Tests\n`;
+      (report.missing_tests || []).forEach(t => {
+        comment += `- 🧪 ${t}\n`;
+      });
+
+      if (report.fix_recommendations && report.fix_recommendations.length > 0) {
+        comment += `\n### 🛠️ Suggested Fixes\n`;
+        report.fix_recommendations.forEach(f => {
+          comment += `**${f.function_or_scope}** in \`${f.file_path}\`:\n${f.description}\n`;
+          if (f.suggested_code_diff) {
+            comment += `\`\`\`diff\n${f.suggested_code_diff}\n\`\`\`\n`;
+          }
+        });
+      }
+
+      navigator.clipboard.writeText(comment).then(() => {
+        const btnText = document.getElementById('copyCommentText');
+        const orig = btnText.innerText;
+        btnText.innerText = "✓ Copied to Clipboard!";
+        setTimeout(() => { btnText.innerText = orig; }, 2500);
+      });
     }
   </script>
 </body>
