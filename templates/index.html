@@ -3,18 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ExForge | Open-Source PR Intelligence & Code Fix Engine</title>
+  <title>ExForge — Open-Source PR Intelligence & Code Fix Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
           colors: {
             brand: {
-              500: '#22c55e',
-              600: '#16a34a',
-              700: '#15803d'
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669'
             }
           }
         }
@@ -22,133 +29,196 @@
     }
   </script>
   <style>
-    pre code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    /* Custom glow & ambient accents */
+    .bg-grid {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+    .glow-emerald {
+      box-shadow: 0 0 35px -5px rgba(16, 185, 129, 0.15);
+    }
+    .glow-card:hover {
+      box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.12);
+      border-color: rgba(52, 211, 153, 0.3);
+    }
   </style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-black">
+<body class="bg-[#090D14] text-slate-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-black antialiased relative overflow-x-hidden">
 
-  <!-- Header -->
-  <header class="border-b border-gray-800 bg-gray-900/60 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+  <!-- Ambient background glow elements -->
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[850px] h-[350px] bg-emerald-500/10 blur-[130px] rounded-full pointer-events-none -z-10"></div>
+  <div class="absolute top-40 right-10 w-[450px] h-[250px] bg-teal-500/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+  <div class="fixed inset-0 bg-grid pointer-events-none -z-20 opacity-60"></div>
+
+  <!-- Top Navigation Header -->
+  <header class="border-b border-slate-800/80 bg-[#090D14]/80 backdrop-blur-xl sticky top-0 z-50 transition">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+      
+      <!-- Logo & Badges -->
       <div class="flex items-center space-x-3">
-        <span class="text-2xl">⚡</span>
-        <div>
-          <span class="font-bold text-xl tracking-tight text-white">Ex<span class="text-emerald-400">Forge</span></span>
-          <span class="text-xs ml-2 px-2 py-0.5 rounded bg-gray-800 text-gray-400 border border-gray-700">Hacktoberfest '26</span>
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-[1px] shadow-lg shadow-emerald-500/20">
+          <div class="w-full h-full bg-[#0B101B] rounded-[11px] flex items-center justify-center">
+            <span class="text-emerald-400 text-lg font-bold">⚡</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-lg tracking-tight text-white">Ex<span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">Forge</span></span>
+          <span class="text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-800/60">
+            Hacktoberfest '26
+          </span>
         </div>
       </div>
-      <div class="flex items-center space-x-4 text-sm text-gray-400">
-        <span class="hidden md:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-950/60 text-emerald-400 border border-emerald-800">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
-          Google Gemma 2 Powered
-        </span>
-        <a href="https://github.com/spectre-arch/ex-Forge" target="_blank" class="hover:text-white transition flex items-center gap-1">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          GitHub
+
+      <!-- Live Engine Badges -->
+      <div class="flex items-center space-x-3 text-xs">
+        <div class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-slate-800 text-slate-300 font-mono">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Google Gemma 2 / Open-Weight AI</span>
+        </div>
+
+        <a href="https://github.com/spectre-arch/ex-Forge" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 text-slate-300 hover:text-white transition flex items-center gap-1.5 font-medium">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>GitHub</span>
         </a>
       </div>
     </div>
   </header>
 
-  <!-- Hero & Input -->
-  <main class="flex-1 max-w-7xl mx-auto px-4 py-8 w-full">
-    <div class="text-center max-w-3xl mx-auto mb-10">
-      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">
-        Deep PR Triage & Code Fixes with <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">Open-Weight AI</span>
+  <!-- Hero Banner & Interactive Search -->
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full">
+    
+    <div class="text-center max-w-3xl mx-auto mb-10 pt-2">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/40 border border-emerald-800/50 text-emerald-400 text-xs font-medium mb-5">
+        <span class="text-xs">✨</span> Autonomous PR Triage & Code Patch Generation
+      </div>
+
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-4 leading-tight">
+        Ship open-source PRs <br class="hidden sm:inline"/>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">with zero friction.</span>
       </h1>
-      <p class="text-gray-400 text-base sm:text-lg">
-        Tailored perspectives for both <span class="text-emerald-400 font-semibold">Contributors</span> getting code merged and <span class="text-teal-400 font-semibold">Maintainers</span> protecting codebases.
+      
+      <p class="text-slate-400 text-sm sm:text-base max-w-2xl mx-auto mb-8 leading-relaxed">
+        ExForge inspects pull requests, identifies touched functions, catches breaking regressions, and generates ready-to-apply patches for <span class="text-slate-200 font-medium">Contributors</span> and <span class="text-slate-200 font-medium">Maintainers</span>.
       </p>
 
-      <!-- Input Box -->
-      <div class="mt-8 relative max-w-2xl mx-auto">
-        <div class="flex flex-col sm:flex-row gap-2 bg-gray-900 border border-gray-700 p-2 rounded-xl shadow-2xl focus-within:border-emerald-500 transition">
-          <input 
-            id="prUrlInput"
-            type="text" 
-            placeholder="Paste public GitHub PR URL (e.g. https://github.com/pallets/flask/pull/5500)" 
-            class="w-full bg-transparent px-4 py-3 text-sm focus:outline-none text-white placeholder-gray-500"
-          />
+      <!-- Search Input Container -->
+      <div class="relative max-w-2xl mx-auto">
+        <div class="relative flex flex-col sm:flex-row items-center p-1.5 rounded-2xl bg-[#0E1523]/90 border border-slate-800 focus-within:border-emerald-500/80 focus-within:ring-2 focus-within:ring-emerald-500/20 shadow-2xl transition duration-200">
+          
+          <div class="flex items-center pl-3.5 w-full">
+            <svg class="w-5 h-5 text-slate-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+            <input 
+              id="prUrlInput"
+              type="text" 
+              placeholder="Paste any GitHub PR link (e.g. https://github.com/pallets/flask/pull/6176)" 
+              class="w-full bg-transparent py-2.5 text-sm focus:outline-none text-white placeholder-slate-500 font-mono"
+            />
+          </div>
+
           <button 
             id="analyzeBtn"
             onclick="triggerAnalysis()"
-            class="bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-semibold px-6 py-3 rounded-lg text-sm transition flex items-center justify-center gap-2 whitespace-nowrap shadow-lg shadow-emerald-500/20"
+            class="w-full sm:w-auto mt-2 sm:mt-0 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-semibold px-6 py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2 whitespace-nowrap shadow-lg shadow-emerald-500/20 active:scale-95 flex-shrink-0"
           >
             <span>Analyze PR</span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
           </button>
         </div>
 
-        <!-- Demo Presets -->
-        <div class="flex items-center justify-center gap-2 mt-4 text-xs text-gray-500">
-          <span>Try quick demo:</span>
-          <button onclick="setDemo('https://github.com/pallets/flask/pull/5500')" class="text-emerald-400 hover:underline">pallets/flask #5500</button>
-          <span>•</span>
-          <button onclick="setDemo('https://github.com/tiangolo/fastapi/pull/11000')" class="text-emerald-400 hover:underline">tiangolo/fastapi #11000</button>
+        <!-- Quick Launch Presets -->
+        <div class="flex flex-wrap items-center justify-center gap-2 mt-4 text-xs text-slate-400">
+          <span class="text-slate-500">Quick Test:</span>
+          <button onclick="setDemo('https://github.com/pallets/flask/pull/6176')" class="px-2.5 py-1 rounded-md bg-slate-900/80 border border-slate-800 hover:border-emerald-500/50 hover:text-emerald-400 transition font-mono">
+            pallets/flask #6176
+          </button>
+          <button onclick="setDemo('https://github.com/tiangolo/fastapi/pull/11000')" class="px-2.5 py-1 rounded-md bg-slate-900/80 border border-slate-800 hover:border-emerald-500/50 hover:text-emerald-400 transition font-mono">
+            tiangolo/fastapi #11000
+          </button>
+          <button onclick="setDemo('https://github.com/pallets/flask/pull/5500')" class="px-2.5 py-1 rounded-md bg-slate-900/80 border border-slate-800 hover:border-emerald-500/50 hover:text-emerald-400 transition font-mono">
+            pallets/flask #5500
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- Spinner State -->
-    <div id="loader" class="hidden text-center py-16">
-      <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500 mb-4"></div>
-      <p class="text-gray-300 font-medium">Extracting git hunks & running Gemma 2 code comprehension...</p>
-      <p class="text-gray-500 text-xs mt-1">Inspecting functions, detecting regressions, and forging patches</p>
+    <!-- Shimmering Loading State -->
+    <div id="loader" class="hidden text-center py-20 max-w-lg mx-auto">
+      <div class="relative w-16 h-16 mx-auto mb-6">
+        <div class="absolute inset-0 rounded-full border-2 border-emerald-500/20 animate-ping"></div>
+        <div class="w-16 h-16 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin"></div>
+        <div class="absolute inset-0 flex items-center justify-center text-emerald-400 font-bold text-lg">⚡</div>
+      </div>
+      <h3 class="text-lg font-bold text-white mb-1">Auditing Pull Request</h3>
+      <p class="text-slate-400 text-xs">Extracting git diffs, inspecting AST signatures &amp; running Google Gemma 2 triage...</p>
     </div>
 
-    <!-- Results Area -->
-    <div id="results" class="hidden space-y-6">
+    <!-- Results Container -->
+    <div id="results" class="hidden space-y-6 animate-fade-in">
 
-      <!-- Header Card with Persona Toggle -->
-      <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-xl">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-800 pb-4 mb-4">
-          <div>
-            <div class="flex items-center gap-2 text-xs text-gray-400 mb-1">
-              <span id="repoName" class="font-semibold text-emerald-400">owner/repo</span>
-              <span>•</span>
-              <span id="prAuthor">@author</span>
-              <span>•</span>
-              <span id="prBranch">main &lt;- feature</span>
+      <!-- Top PR Info Banner & Persona Switcher Card -->
+      <div class="bg-[#0E1523]/90 border border-slate-800/90 rounded-2xl p-6 shadow-2xl backdrop-blur-xl">
+        
+        <!-- Repo & Title Bar -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-slate-800/80">
+          <div class="space-y-1.5">
+            <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
+              <span id="repoName" class="px-2.5 py-0.5 rounded-md bg-slate-800/80 text-emerald-400 font-semibold border border-slate-700/60">
+                owner/repo
+              </span>
+              <span class="text-slate-500">•</span>
+              <span id="prAuthor" class="text-slate-300 font-medium">@author</span>
+              <span class="text-slate-500">•</span>
+              <span id="prBranch" class="px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800">
+                main &lt;- feature
+              </span>
             </div>
-            <h2 id="prTitle" class="text-xl font-bold text-white">PR Title Goes Here</h2>
+            <h2 id="prTitle" class="text-xl sm:text-2xl font-bold text-white tracking-tight pt-1">
+              Pull Request Title
+            </h2>
           </div>
-          <div class="flex items-center gap-3">
-            <span id="changesBadge" class="px-3 py-1 bg-gray-800 rounded-lg text-xs font-mono text-gray-300 border border-gray-700">
+
+          <!-- Quick Changes Stats -->
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span id="changesBadge" class="px-3 py-1.5 rounded-lg bg-slate-900/90 font-mono text-xs font-medium text-slate-300 border border-slate-800">
               +0 / -0
             </span>
           </div>
         </div>
 
-        <!-- Role Category Selector (Contributor vs Maintainer) -->
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-gray-950/80 p-3 rounded-xl border border-gray-800">
+        <!-- Segmented Role Switcher -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5">
           <div class="flex items-center gap-2 w-full sm:w-auto">
-            <span class="text-xs text-gray-400 font-medium uppercase tracking-wider mr-2">Perspective:</span>
-            <div class="inline-flex rounded-lg bg-gray-900 p-1 border border-gray-800">
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Perspective:</span>
+            
+            <div class="inline-flex rounded-xl bg-slate-950 p-1 border border-slate-800">
               <button 
                 id="btnRoleContributor" 
                 onclick="switchRole('contributor')" 
-                class="px-4 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-2 bg-emerald-500 text-gray-950 shadow-md"
+                class="px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/20"
               >
                 <span>👨‍💻 Contributor Mode</span>
-                <span class="text-[10px] bg-emerald-950/40 px-1.5 py-0.2 rounded text-gray-900 font-mono">Fix & Ship</span>
+                <span class="text-[10px] bg-emerald-950/60 px-1.5 py-0.5 rounded font-mono font-bold text-slate-900">Fix &amp; Ship</span>
               </button>
+              
               <button 
                 id="btnRoleMaintainer" 
                 onclick="switchRole('maintainer')" 
-                class="px-4 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-2 text-gray-400 hover:text-white"
+                class="px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-400 hover:text-white"
               >
                 <span>🛡️ Maintainer Mode</span>
-                <span class="text-[10px] bg-gray-800 px-1.5 py-0.2 rounded text-gray-300 font-mono">Review & Guard</span>
+                <span class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded font-mono text-slate-300">Triage &amp; Guard</span>
               </button>
             </div>
           </div>
 
-          <!-- Dynamic Action Button based on Role -->
-          <div id="roleActionArea">
+          <!-- Dynamic Action Buttons -->
+          <div>
             <button 
               id="btnContributorAction" 
               onclick="downloadPatch()" 
-              class="bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-bold text-xs px-4 py-2 rounded-lg flex items-center gap-2 transition shadow-md shadow-emerald-500/20"
+              class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-500/20 active:scale-95"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
               <span>Download .patch for git apply</span>
@@ -157,10 +227,10 @@
             <button 
               id="btnMaintainerAction" 
               onclick="copyReviewComment()" 
-              class="hidden bg-gray-800 hover:bg-gray-700 text-emerald-400 border border-emerald-800 text-xs px-4 py-2 rounded-lg flex items-center gap-2 transition"
+              class="hidden w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-emerald-400 border border-emerald-800/80 text-xs px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition active:scale-95 shadow-md"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
-              <span id="copyCommentText">Copy GitHub Review Comment</span>
+              <span id="copyCommentText">Copy GitHub Review Markdown</span>
             </button>
           </div>
         </div>
@@ -170,57 +240,68 @@
       <!-- ==================== VIEW 1: CONTRIBUTOR MODE ==================== -->
       <div id="viewContributor" class="space-y-6">
         
-        <!-- Contributor Quick Guide Banner -->
-        <div class="bg-gradient-to-r from-emerald-950/40 via-gray-900 to-gray-900 border border-emerald-800/40 rounded-xl p-4 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold">✓</div>
+        <!-- Checklist Banner -->
+        <div class="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-800/40 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+          <div class="flex items-center gap-3.5">
+            <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-sm">
+              ✓
+            </div>
             <div>
-              <div class="text-sm font-semibold text-emerald-300">Contributor Action Checklist</div>
-              <div class="text-xs text-gray-400">Review the diagnosed fixes below, download the patch, apply locally, and update your PR branch.</div>
+              <div class="text-sm font-semibold text-emerald-300">Contributor Action Plan</div>
+              <div class="text-xs text-slate-400">Review the diagnosed fixes, export your unified patch, and run the 3 terminal commands below to update your branch.</div>
             </div>
           </div>
-          <div class="text-xs text-gray-400 font-mono hidden md:block">
+          <div class="text-xs font-mono px-3 py-1.5 rounded-lg bg-slate-950/80 text-emerald-400 border border-slate-800 whitespace-nowrap">
             git apply &lt;patch&gt; &amp;&amp; git push
           </div>
         </div>
 
         <div class="grid lg:grid-cols-12 gap-6">
           
-          <!-- Left: Fix Guidance (7 Cols) -->
+          <!-- Left: Code Fix Recommendations (7 Cols) -->
           <div class="lg:col-span-7 space-y-4">
-            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-xl">
-              <div class="flex items-center justify-between mb-3 border-b border-gray-800 pb-3">
+            <div class="bg-[#0E1523]/90 border border-slate-800/80 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-xl">
+              <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800/80">
                 <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
-                  Step-by-Step Code Fixes
+                  Actionable Code Fixes &amp; Patches
                 </h3>
-                <span class="text-[11px] text-gray-400 font-mono">Prescribed by Gemma 2</span>
+                <span class="text-[11px] text-slate-400 font-mono">Prescribed by Gemma 2</span>
               </div>
               <div id="contributorFixesList" class="space-y-4"></div>
             </div>
           </div>
 
-          <!-- Right: Missing Tests & Pre-flight (5 Cols) -->
+          <!-- Right: Missing Tests & Quickstart (5 Cols) -->
           <div class="lg:col-span-5 space-y-6">
-            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-xl">
-              <h3 class="text-sm font-bold text-teal-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+            
+            <div class="bg-[#0E1523]/90 border border-slate-800/80 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-xl">
+              <h3 class="text-sm font-bold text-teal-400 uppercase tracking-wider mb-2 flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                 Missing Tests You Should Add
               </h3>
-              <p class="text-xs text-gray-400 mb-3">Adding these tests will satisfy maintainer standards and prevent CI rejections:</p>
-              <div id="contributorTestsList" class="space-y-2 text-xs"></div>
+              <p class="text-xs text-slate-400 mb-4">Adding these tests guarantees your PR passes CI tests and meets maintainer standards:</p>
+              <div id="contributorTestsList" class="space-y-2.5 text-xs"></div>
             </div>
 
-            <!-- How to apply instructions card -->
-            <div class="bg-gray-950/80 border border-gray-800 rounded-xl p-4 text-xs space-y-2">
-              <div class="font-bold text-gray-300">Terminal Quickstart:</div>
-              <ol class="list-decimal list-inside text-gray-400 space-y-1 font-mono text-[11px]">
-                <li>Click <span class="text-emerald-400">"Download .patch"</span> above</li>
-                <li>Run: <span class="text-white">git apply path/to/fixes.patch</span></li>
-                <li>Verify: <span class="text-white">git diff</span></li>
-                <li>Push: <span class="text-white">git commit -am "fix: apply fixes" &amp;&amp; git push</span></li>
-              </ol>
+            <!-- Terminal Quickstart Card -->
+            <div class="bg-slate-950/90 border border-slate-800/90 rounded-2xl p-5 shadow-xl">
+              <div class="flex items-center gap-2 text-xs font-bold text-slate-200 mb-3">
+                <span class="text-emerald-400">⚡</span> Terminal Quickstart (Apply in 10s):
+              </div>
+              <div class="space-y-2 text-xs font-mono text-slate-300">
+                <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between">
+                  <span>1. Click <strong class="text-emerald-400">Download .patch</strong> above</span>
+                </div>
+                <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between">
+                  <span class="text-slate-400">$ <span class="text-slate-100">git apply fixes.patch</span></span>
+                </div>
+                <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-between">
+                  <span class="text-slate-400">$ <span class="text-slate-100">git commit -am "fix: apply fixes" &amp;&amp; git push</span></span>
+                </div>
+              </div>
             </div>
+
           </div>
 
         </div>
@@ -230,37 +311,44 @@
       <div id="viewMaintainer" class="hidden space-y-6">
         
         <!-- Maintainer Gatekeeper Banner -->
-        <div class="bg-gradient-to-r from-teal-950/40 via-gray-900 to-gray-900 border border-teal-800/40 rounded-xl p-4 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-teal-500/20 flex items-center justify-center text-teal-400 font-bold">🛡️</div>
+        <div class="bg-gradient-to-r from-teal-950/40 via-slate-900 to-slate-900 border border-teal-800/40 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+          <div class="flex items-center gap-3.5">
+            <div class="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-500/30 flex items-center justify-center text-teal-400 font-bold text-sm">
+              🛡️
+            </div>
             <div>
               <div class="text-sm font-semibold text-teal-300">Maintainer Triage &amp; Risk Gate</div>
-              <div class="text-xs text-gray-400">Review high-level architectural blast radius, breaking changes, and copy ready-to-post review feedback.</div>
+              <div class="text-xs text-slate-400">Review high-level architectural blast radius, breaking changes, and copy ready-to-post feedback.</div>
             </div>
           </div>
-          <button onclick="copyReviewComment()" class="text-xs text-teal-400 hover:underline font-medium hidden md:block">
-            Copy Markdown Review Comment ➔
+          <button onclick="copyReviewComment()" class="text-xs text-teal-400 hover:text-teal-300 underline font-medium whitespace-nowrap">
+            Copy Markdown Review ➔
           </button>
         </div>
 
         <!-- High-level Summaries -->
-        <div class="grid md:grid-cols-2 gap-4">
-          <div class="bg-gray-900 p-5 rounded-xl border border-gray-800 shadow-xl">
-            <div class="text-xs uppercase font-bold text-emerald-400 tracking-wider mb-2">Executive Summary</div>
-            <p id="prSummary" class="text-sm text-gray-300 leading-relaxed"></p>
+        <div class="grid md:grid-cols-2 gap-5">
+          <div class="bg-[#0E1523]/90 p-5 sm:p-6 rounded-2xl border border-slate-800/80 shadow-xl backdrop-blur-xl">
+            <div class="text-xs uppercase font-bold text-emerald-400 tracking-wider mb-2 flex items-center gap-1.5">
+              <span>📋</span> Executive Summary
+            </div>
+            <p id="prSummary" class="text-sm text-slate-300 leading-relaxed"></p>
           </div>
-          <div class="bg-gray-900 p-5 rounded-xl border border-gray-800 shadow-xl">
-            <div class="text-xs uppercase font-bold text-teal-400 tracking-wider mb-2">Architectural Intent &amp; Scope</div>
-            <p id="prIntent" class="text-sm text-gray-300 leading-relaxed"></p>
+
+          <div class="bg-[#0E1523]/90 p-5 sm:p-6 rounded-2xl border border-slate-800/80 shadow-xl backdrop-blur-xl">
+            <div class="text-xs uppercase font-bold text-teal-400 tracking-wider mb-2 flex items-center gap-1.5">
+              <span>🏛️</span> Architectural Intent &amp; Scope
+            </div>
+            <p id="prIntent" class="text-sm text-slate-300 leading-relaxed"></p>
           </div>
         </div>
 
         <div class="grid lg:grid-cols-12 gap-6">
           
-          <!-- Left: Files & Functions Blast Radius (6 Cols) -->
+          <!-- Left: Blast Radius (6 Cols) -->
           <div class="lg:col-span-6 space-y-4">
-            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-xl">
-              <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <div class="bg-[#0E1523]/90 border border-slate-800/80 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-xl">
+              <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider mb-3.5 flex items-center gap-2">
                 <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 Blast Radius: Files &amp; Functions Touched
               </h3>
@@ -268,14 +356,14 @@
             </div>
           </div>
 
-          <!-- Right: Breaking Changes & Risks (6 Cols) -->
+          <!-- Right: Breaking Changes (6 Cols) -->
           <div class="lg:col-span-6 space-y-4">
-            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 shadow-xl">
-              <h3 class="text-sm font-bold text-red-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <div class="bg-[#0E1523]/90 border border-slate-800/80 rounded-2xl p-5 sm:p-6 shadow-xl backdrop-blur-xl">
+              <h3 class="text-sm font-bold text-red-400 uppercase tracking-wider mb-3.5 flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                Breaking Change &amp; Security Risks
+                Breaking Changes &amp; Security Risks
               </h3>
-              <div id="maintainerRisksList" class="space-y-2 text-xs"></div>
+              <div id="maintainerRisksList" class="space-y-2.5 text-xs"></div>
             </div>
           </div>
 
@@ -286,8 +374,14 @@
     </div>
   </main>
 
-  <footer class="border-t border-gray-800 py-6 text-center text-xs text-gray-500">
-    ExForge • Open-Source PR Intelligence Engine • Built with ❤️ for DevForge 2026 Hack Day
+  <!-- Clean Minimalist Footer -->
+  <footer class="border-t border-slate-800/80 py-8 text-center text-xs text-slate-500 bg-[#090D14]/90">
+    <div class="flex items-center justify-center gap-2 mb-1">
+      <span class="font-bold text-slate-300">ExForge</span>
+      <span>•</span>
+      <span>Autonomous PR Intelligence Engine</span>
+    </div>
+    <p>Built for DevForge × Hacktoberfest 2026 Hack Day (Bengaluru Finals) • Powered by Major League Hacking (MLH)</p>
   </footer>
 
   <script>
@@ -304,15 +398,15 @@
       const btnActM = document.getElementById('btnMaintainerAction');
 
       if (role === 'contributor') {
-        btnC.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-2 bg-emerald-500 text-gray-950 shadow-md";
-        btnM.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-2 text-gray-400 hover:text-white";
+        btnC.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/20";
+        btnM.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-400 hover:text-white";
         viewC.classList.remove('hidden');
         viewM.classList.add('hidden');
         btnActC.classList.remove('hidden');
         btnActM.classList.add('hidden');
       } else {
-        btnM.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-2 bg-teal-400 text-gray-950 shadow-md";
-        btnC.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition flex items-center gap-2 text-gray-400 hover:text-white";
+        btnM.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-gradient-to-r from-teal-400 to-cyan-400 text-slate-950 shadow-md shadow-teal-500/20";
+        btnC.className = "px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-400 hover:text-white";
         viewM.classList.remove('hidden');
         viewC.classList.add('hidden');
         btnActM.classList.remove('hidden');
@@ -366,43 +460,59 @@
       // Render Contributor Fixes
       const cFixes = document.getElementById('contributorFixesList');
       cFixes.innerHTML = '';
-      (report.fix_recommendations || []).forEach((fix, i) => {
-        const box = document.createElement('div');
-        box.className = "p-4 bg-gray-950/80 border border-gray-800 rounded-lg space-y-2";
-        box.innerHTML = `
-          <div class="flex items-center justify-between text-xs">
-            <span class="font-mono text-emerald-400 font-bold">${fix.function_or_scope}</span>
-            <span class="px-2 py-0.5 rounded bg-amber-950/50 text-amber-300 border border-amber-800 text-[10px] uppercase font-semibold">${fix.issue_type}</span>
+      if (!report.fix_recommendations || report.fix_recommendations.length === 0) {
+        cFixes.innerHTML = `
+          <div class="p-6 rounded-xl bg-emerald-950/20 border border-emerald-800/40 text-center space-y-2">
+            <div class="text-2xl">🎉</div>
+            <div class="text-sm font-semibold text-emerald-300">Clean Implementation — Merge Ready!</div>
+            <p class="text-xs text-slate-400">No bugs or syntax errors detected in this pull request. The code adheres to clean architectural patterns.</p>
           </div>
-          <div class="text-xs text-gray-300">${fix.description}</div>
-          <div class="text-[11px] text-gray-500 font-mono">File: ${fix.file_path}</div>
-          ${fix.suggested_code_diff ? `
-            <pre class="bg-gray-900 p-3 rounded-md text-xs font-mono text-emerald-300 overflow-x-auto border border-gray-800"><code>${escapeHtml(fix.suggested_code_diff)}</code></pre>
-          ` : ''}
         `;
-        cFixes.appendChild(box);
-      });
+      } else {
+        report.fix_recommendations.forEach((fix, i) => {
+          const box = document.createElement('div');
+          box.className = "p-4 sm:p-5 bg-slate-950/80 border border-slate-800/90 rounded-xl space-y-2.5 glow-card transition duration-200";
+          box.innerHTML = `
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-mono text-emerald-400 font-bold">${fix.function_or_scope}</span>
+              <span class="px-2 py-0.5 rounded bg-amber-950/60 text-amber-300 border border-amber-800 text-[10px] uppercase font-bold tracking-wider">${fix.issue_type}</span>
+            </div>
+            <div class="text-xs text-slate-300 leading-relaxed">${fix.description}</div>
+            <div class="text-[11px] text-slate-500 font-mono flex items-center gap-1">
+              <span>📄 Target:</span> <span class="text-slate-400">${fix.file_path}</span>
+            </div>
+            ${fix.suggested_code_diff ? `
+              <pre class="bg-[#0B101B] p-3.5 rounded-lg text-xs font-mono text-emerald-300 overflow-x-auto border border-slate-800/90 leading-relaxed"><code>${escapeHtml(fix.suggested_code_diff)}</code></pre>
+            ` : ''}
+          `;
+          cFixes.appendChild(box);
+        });
+      }
 
       // Render Contributor Tests
       const cTests = document.getElementById('contributorTestsList');
       cTests.innerHTML = '';
-      (report.missing_tests || []).forEach(t => {
-        const p = document.createElement('div');
-        p.className = "p-2.5 bg-teal-950/20 border border-teal-900/40 rounded text-teal-300";
-        p.innerText = `🧪 ${t}`;
-        cTests.appendChild(p);
-      });
+      if (!report.missing_tests || report.missing_tests.length === 0) {
+        cTests.innerHTML = `<div class="p-3 bg-slate-900/60 border border-slate-800 rounded-lg text-slate-400">Existing test coverage is sufficient.</div>`;
+      } else {
+        report.missing_tests.forEach(t => {
+          const p = document.createElement('div');
+          p.className = "p-3 bg-teal-950/20 border border-teal-900/40 rounded-xl text-teal-300 flex items-start gap-2.5";
+          p.innerHTML = `<span class="text-teal-400 font-bold mt-0.5">🧪</span> <span>${t}</span>`;
+          cTests.appendChild(p);
+        });
+      }
 
       // Render Maintainer Functions Blast Radius
       const mFuncs = document.getElementById('maintainerFunctionsList');
       mFuncs.innerHTML = '';
       (report.touched_functions || []).forEach(fn => {
         const div = document.createElement('div');
-        div.className = "p-3 bg-gray-950/70 border border-gray-800 rounded-lg";
+        div.className = "p-3.5 bg-slate-950/70 border border-slate-800/80 rounded-xl glow-card transition duration-200";
         div.innerHTML = `
           <div class="text-xs font-mono text-emerald-400 font-semibold truncate">${fn.function_name}</div>
-          <div class="text-[11px] text-gray-500 font-mono">${fn.file_path}</div>
-          <div class="text-xs text-gray-400 mt-1">${fn.summary_of_change}</div>
+          <div class="text-[11px] text-slate-500 font-mono mt-0.5">${fn.file_path}</div>
+          <div class="text-xs text-slate-400 mt-1.5">${fn.summary_of_change}</div>
         `;
         mFuncs.appendChild(div);
       });
@@ -410,14 +520,19 @@
       // Render Maintainer Risks
       const mRisks = document.getElementById('maintainerRisksList');
       mRisks.innerHTML = '';
-      (report.breaking_changes_or_risks || []).forEach(r => {
-        const p = document.createElement('div');
-        p.className = "p-2.5 bg-red-950/20 border border-red-900/40 rounded text-red-300";
-        p.innerText = `⚠️ ${r}`;
-        mRisks.appendChild(p);
-      });
+      if (!report.breaking_changes_or_risks || report.breaking_changes_or_risks.length === 0) {
+        mRisks.innerHTML = `<div class="p-3.5 bg-slate-900/60 border border-slate-800 rounded-xl text-emerald-400 flex items-center gap-2 text-xs"><span>✓</span> Zero critical breaking changes detected.</div>`;
+      } else {
+        report.breaking_changes_or_risks.forEach(r => {
+          const p = document.createElement('div');
+          p.className = "p-3.5 bg-red-950/20 border border-red-900/40 rounded-xl text-red-300 flex items-start gap-2.5";
+          p.innerHTML = `<span class="text-red-400 font-bold mt-0.5">⚠️</span> <span>${r}</span>`;
+          mRisks.appendChild(p);
+        });
+      }
 
       document.getElementById('results').classList.remove('hidden');
+      document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
     }
 
     function escapeHtml(text) {
@@ -457,7 +572,7 @@
       navigator.clipboard.writeText(comment).then(() => {
         const btnText = document.getElementById('copyCommentText');
         const orig = btnText.innerText;
-        btnText.innerText = "✓ Copied to Clipboard!";
+        btnText.innerText = "✓ Copied Markdown to Clipboard!";
         setTimeout(() => { btnText.innerText = orig; }, 2500);
       });
     }
