@@ -1,5 +1,22 @@
 #!/usr/bin/env python3
 import os
+
+# Auto-load local .env file if present
+def load_env_file():
+    env_path = os.path.join(os.path.dirname(__file__), ".env")
+    if os.path.exists(env_path):
+        with open(env_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    key, val = line.split("=", 1)
+                    key = key.strip()
+                    val = val.strip().strip("'").strip('"')
+                    if key and key not in os.environ:
+                        os.environ[key] = val
+
+load_env_file()
+
 from flask import Flask, render_template, request, jsonify, Response
 from core.analyzer import ExForgeAnalyzer
 from core.patch_exporter import PatchExporter
