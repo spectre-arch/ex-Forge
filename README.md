@@ -20,8 +20,9 @@ Simultaneously, first-time contributors struggle to understand existing codebase
 **ExForge** is an open-source PR intelligence agent designed to automate the hard parts of code review:
 1. **Architectural Comprehension**: Deeply understands the intent of any public GitHub Pull Request from its description and unified diffs.
 2. **Precision Function Mapping**: Identifies every exact file, class, and function touched by the PR.
-3. **Actionable Fix & Patch Engine**: Diagnoses edge cases, breaking changes, or bugs, and generates ready-to-apply code patches to guide contributors on *how to fix the code*.
+3. **Actionable Fix & Patch Engine**: Diagnoses edge cases, breaking changes, or bugs, and generates ready-to-apply `.patch` files to guide contributors on *how to fix the code*.
 4. **100% Open-Weight AI**: Powered by **Google Gemma 2** and **Meta Llama 3.1**, running either 100% offline via **Ollama** or high-speed cloud via **Groq**.
+5. **Zero-Friction Interfaces**: Beautiful Dark Mode Web Dashboard (`server.py`), Terminal CLI (`cli.py`), and automated GitHub Actions (`.github/workflows/`).
 
 ---
 
@@ -40,51 +41,38 @@ Simultaneously, first-time contributors struggle to understand existing codebase
 [ Open-Weight LLM ]     ──> Google Gemma 2 / Meta Llama 3.1
        │
        ▼
-[ ExForge Output ]      ──> Summary + Affected Functions + Prescribed Code Diffs + Test Gaps
+[ ExForge Output Engine ]
        │
-   ├── CLI Mode: terminal dashboard (`python cli.py review <PR_URL>`)
-   └── Web Mode: interactive Streamlit dashboard (`streamlit run app.py`)
+   ├── Web Dashboard: `python server.py` (Local UI + 1-Click Patch Export)
+   ├── Terminal CLI: `python cli.py <PR_URL>` (Rich ANSI formatted terminal report)
+   └── GitHub Action: `.github/workflows/exforge-triage.yml` (Automated PR triage bot)
 ```
 
 ---
 
 ## 📦 Quickstart
 
-### 1. Prerequisites
-- Python 3.10+
-- Git
-
-### 2. Clone the Repository
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/spectre-arch/ex-Forge.git
 cd ex-Forge
 ```
 
-### 3. Install Dependencies
+### 2. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
+*(Note: Core CLI and Web Server only require `requests` and `flask`, which are already standard!)*
 
-### 4. Configuration
-Copy `.env.example` to `.env`:
+### 3. Run the Modern Web Dashboard
 ```bash
-cp .env.example .env
+python server.py
 ```
-Fill in your configuration:
-- For high-speed cloud inference: get a free key from [Groq](https://console.groq.com) and set `GROQ_API_KEY=...`
-- For 100% offline local inference: set `LLM_PROVIDER=ollama` and run `ollama run gemma2`
+Open **`http://localhost:5000`** in your browser to inspect PRs, view function maps, and export `.patch` files!
 
-### 5. Run ExForge
-
-#### Option A: Interactive Web Dashboard
+### 4. Run via Terminal CLI
 ```bash
-streamlit run app.py
-```
-Open your browser at `http://localhost:8501`, paste any GitHub PR link, and click **Analyze PR**.
-
-#### Option B: Terminal CLI
-```bash
-python cli.py review https://github.com/pallets/flask/pull/5500
+python cli.py https://github.com/pallets/flask/pull/5500
 ```
 
 ---
@@ -96,7 +84,8 @@ ExForge solves maintainer fatigue and contributor onboarding by turning raw git 
 
 ### MLH Challenge: Best Open-Source AI Project
 - Powered by **Google Gemma 2 (`gemma2-9b-it` / `gemma2:2b`)** and **Meta Llama 3.1**.
-- Supports local inference via **Ollama** ensuring privacy and zero vendor lock-in.
+- Supports local inference via **Ollama** ensuring privacy, zero telemetry, and zero vendor lock-in.
+- Includes offline demo fail-safe mode so presentations never fail due to spotty venue Wi-Fi.
 
 ---
 
@@ -104,7 +93,7 @@ ExForge solves maintainer fatigue and contributor onboarding by turning raw git 
 *(In compliance with DevForge Rule 04 and Slide 14)*
 - **AI Coding Assistants Used**: Antigravity, Google Gemini for architectural scaffolding and code pair-programming. All team members can explain every function and module.
 - **Open-Source Models**: Google Gemma 2, Meta Llama 3.1.
-- **Libraries**: `requests`, `streamlit`, `rich`, `pydantic`, `python-dotenv`.
+- **Libraries**: `requests`, `flask`, `dataclasses`.
 
 ---
 
