@@ -57,6 +57,8 @@ def download_patch():
 
 @app.route("/api/analyze", methods=["POST"])
 @app.route("/analyze", methods=["POST"])
+@app.route("/api/index.py", methods=["POST"])
+@app.route("/api/index", methods=["POST"])
 @app.route("/api/index/api/analyze", methods=["POST"])
 def analyze():
     data = request.get_json() or {}
@@ -93,9 +95,13 @@ def analyze():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
+@app.route("/", defaults={"path": ""}, methods=["GET", "POST"])
+@app.route("/<path:path>", methods=["GET", "POST"])
 def index(path=""):
+    if request.method == "POST":
+        return analyze()
+    if path.startswith("api/patch") or path.startswith("patch") or request.args.get("action") == "patch":
+        return download_patch()
     return render_template("index.html")
 
 
