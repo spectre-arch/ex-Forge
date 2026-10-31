@@ -23,7 +23,11 @@ from core.patch_exporter import PatchExporter
 from core.demo_provider import get_mock_pr_analysis
 from dataclasses import asdict
 
-app = Flask(__name__)
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, "templates")
+)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
