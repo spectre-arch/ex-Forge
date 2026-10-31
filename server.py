@@ -35,12 +35,29 @@ app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 LAST_ANALYSIS = {}
 
 
-@app.route("/")
-def index():
-    return render_template("index.html")
+@app.route("/api/patch", methods=["GET"])
+@app.route("/patch", methods=["GET"])
+@app.route("/api/index/api/patch", methods=["GET"])
+def download_patch():
+    report = LAST_ANALYSIS.get("report")
+    pr_info = LAST_ANALYSIS.get("pr_info")
+
+    if not report or not report.fix_recommendations:
+        return "No active patch available. Run an analysis first.", 404
+
+    repo_label = f"{pr_info.owner}_{pr_info.repo}_pr{pr_info.pr_number}" if pr_info else "exforge_fixes"
+    patch_content = PatchExporter.generate_patch(report.fix_recommendations, repo_name=repo_label)
+
+    return Response(
+        patch_content,
+        mimetype="text/x-diff",
+        headers={"Content-Disposition": f"attachment; filename={repo_label}.patch"}
+    )
 
 
 @app.route("/api/analyze", methods=["POST"])
+@app.route("/analyze", methods=["POST"])
+@app.route("/api/index/api/analyze", methods=["POST"])
 def analyze():
     data = request.get_json() or {}
     url = data.get("url", "").strip()
@@ -76,22 +93,10 @@ def analyze():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/patch", methods=["GET"])
-def download_patch():
-    report = LAST_ANALYSIS.get("report")
-    pr_info = LAST_ANALYSIS.get("pr_info")
-
-    if not report or not report.fix_recommendations:
-        return "No active patch available. Run an analysis first.", 404
-
-    repo_label = f"{pr_info.owner}_{pr_info.repo}_pr{pr_info.pr_number}" if pr_info else "exforge_fixes"
-    patch_content = PatchExporter.generate_patch(report.fix_recommendations, repo_name=repo_label)
-
-    return Response(
-        patch_content,
-        mimetype="text/x-diff",
-        headers={"Content-Disposition": f"attachment; filename={repo_label}.patch"}
-    )
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def index(path=""):
+    return render_template("index.html")
 
 
 if __name__ == "__main__":
